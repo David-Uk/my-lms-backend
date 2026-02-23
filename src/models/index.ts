@@ -8,3 +8,5 @@ export { LessonProgress } from './lesson-progress.model';
 export { Assessment, AssessmentType } from './assessment.model';
 export { Quiz } from './quiz.model';
 export { QuizQuestion, QuestionType } from './quiz-question.model';
+export { Attendance, AttendanceStatus } from './attendance.model';
+export { CourseTutor } from './course-tutor.model';

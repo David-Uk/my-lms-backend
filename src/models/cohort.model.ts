@@ -13,6 +13,7 @@ import {
 } from 'sequelize-typescript';
 import { Course } from './course.model';
 import { Enrollment } from './enrollment.model';
+import { Attendance } from './attendance.model';
 // import { Enrollment } from './enrollment.model';
 
 @Table({
@@ -58,6 +59,9 @@ export class Cohort extends Model<Cohort> {
 
   @HasMany(() => Enrollment)
   enrollments: Enrollment[];
+
+  @HasMany(() => Attendance)
+  attendances: Attendance[];
 
   @CreatedAt
   declare createdAt: Date;

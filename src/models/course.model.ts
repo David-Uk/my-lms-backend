@@ -13,6 +13,8 @@ import {
 } from 'sequelize-typescript';
 import { User } from './user.model';
 import { CourseContent } from './course-content.model';
+import { CourseTutor } from './course-tutor.model';
+import { Cohort } from './cohort.model';
 
 export enum CourseLevel {
   BEGINNER = 'beginner',
@@ -62,6 +64,12 @@ export class Course extends Model<Course> {
 
   @HasMany(() => CourseContent)
   contents: CourseContent[];
+
+  @HasMany(() => CourseTutor)
+  courseTutors: CourseTutor[];
+
+  @HasMany(() => Cohort)
+  cohorts: Cohort[];
 
   @CreatedAt
   declare createdAt: Date;
