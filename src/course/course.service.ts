@@ -6,11 +6,12 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Op } from 'sequelize';
+import { Op, WhereOptions, CreationAttributes } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import {
   Course,
   CourseTutor,
+  CourseContent,
   Cohort,
   Enrollment,
   User,
@@ -25,6 +26,8 @@ import {
   BulkAssignTutorsDto,
   EnrollLearnerDto,
   BulkEnrollLearnersDto,
+  CreateCourseContentDto,
+  UpdateCourseContentDto,
 } from '../dto/course.dto';
 
 @Injectable()
@@ -40,6 +43,8 @@ export class CourseService {
     private enrollmentModel: typeof Enrollment,
     @InjectModel(User)
     private userModel: typeof User,
+    @InjectModel(CourseContent)
+    private courseContentModel: typeof CourseContent,
     private sequelize: Sequelize,
   ) {}
 
@@ -54,7 +59,7 @@ export class CourseService {
     const course = await this.courseModel.create({
       ...createCourseDto,
       creatorId,
-    } as any);
+    } as CreationAttributes<Course>);
     return course;
   }
 
@@ -62,7 +67,7 @@ export class CourseService {
     const { page = 1, limit = 10, search, difficultyLevel } = query;
     const offset = (page - 1) * limit;
 
-    const where: any = {};
+    const where: WhereOptions<Course> = {};
 
     if (search) {
       where.title = { [Op.iLike]: `%${search}%` };
@@ -122,6 +127,15 @@ export class CourseService {
           model: Cohort,
           attributes: ['id', 'name', 'startDate', 'endDate'],
         },
+        {
+          model: CourseContent,
+          where: { parentId: null },
+          required: false,
+          include: [{ model: CourseContent, as: 'children' }],
+        },
+      ],
+      order: [
+        [{ model: CourseContent, as: 'contents' }, 'sequenceOrder', 'ASC'],
       ],
     });
 
@@ -149,7 +163,9 @@ export class CourseService {
       currentUserRole !== UserRole.ADMIN &&
       currentUserRole !== UserRole.SUPERADMIN
     ) {
-      throw new ForbiddenException('You do not have permission to update this course');
+      throw new ForbiddenException(
+        'You do not have permission to update this course',
+      );
     }
 
     await course.update(updateCourseDto);
@@ -171,7 +187,9 @@ export class CourseService {
       currentUserRole !== UserRole.ADMIN &&
       currentUserRole !== UserRole.SUPERADMIN
     ) {
-      throw new ForbiddenException('You do not have permission to delete this course');
+      throw new ForbiddenException(
+        'You do not have permission to delete this course',
+      );
     }
 
     // Soft delete (paranoid mode)
@@ -182,7 +200,10 @@ export class CourseService {
   //  TUTOR MANAGEMENT
   // ═══════════════════════════════════════════════════════════════
 
-  async assignTutor(courseId: string, dto: AssignTutorDto): Promise<CourseTutor> {
+  async assignTutor(
+    courseId: string,
+    dto: AssignTutorDto,
+  ): Promise<CourseTutor> {
     const [course, tutor] = await Promise.all([
       this.courseModel.findByPk(courseId, { attributes: ['id'] }),
       this.userModel.findByPk(dto.tutorId, { attributes: ['id', 'role'] }),
@@ -205,14 +226,16 @@ export class CourseService {
     return this.courseTutorModel.create({
       courseId,
       tutorId: dto.tutorId,
-    } as any);
+    } as CreationAttributes<CourseTutor>);
   }
 
   async bulkAssignTutors(
     courseId: string,
     dto: BulkAssignTutorsDto,
   ): Promise<{ assigned: number; skipped: number }> {
-    const course = await this.courseModel.findByPk(courseId, { attributes: ['id'] });
+    const course = await this.courseModel.findByPk(courseId, {
+      attributes: ['id'],
+    });
     if (!course) throw new NotFoundException('Course not found');
 
     // Validate all users are tutors in a single query
@@ -241,7 +264,10 @@ export class CourseService {
     if (newTutorIds.length > 0) {
       // Use bulkCreate for efficiency
       await this.courseTutorModel.bulkCreate(
-        newTutorIds.map((tutorId) => ({ courseId, tutorId })) as any[],
+        newTutorIds.map((tutorId) => ({
+          courseId,
+          tutorId,
+        })) as CreationAttributes<CourseTutor>[],
       );
     }
 
@@ -264,7 +290,9 @@ export class CourseService {
   }
 
   async getCourseTutors(courseId: string): Promise<User[]> {
-    const course = await this.courseModel.findByPk(courseId, { attributes: ['id'] });
+    const course = await this.courseModel.findByPk(courseId, {
+      attributes: ['id'],
+    });
     if (!course) throw new NotFoundException('Course not found');
 
     const assignments = await this.courseTutorModel.findAll({
@@ -284,11 +312,16 @@ export class CourseService {
   //  LEARNER MANAGEMENT (via Enrollment / Cohort)
   // ═══════════════════════════════════════════════════════════════
 
-  async enrollLearner(courseId: string, dto: EnrollLearnerDto): Promise<Enrollment> {
+  async enrollLearner(
+    courseId: string,
+    dto: EnrollLearnerDto,
+  ): Promise<Enrollment> {
     // Validate course, cohort, and learner in parallel
     const [course, cohort, learner] = await Promise.all([
       this.courseModel.findByPk(courseId, { attributes: ['id'] }),
-      this.cohortModel.findByPk(dto.cohortId, { attributes: ['id', 'courseId'] }),
+      this.cohortModel.findByPk(dto.cohortId, {
+        attributes: ['id', 'courseId'],
+      }),
       this.userModel.findByPk(dto.learnerId, { attributes: ['id', 'role'] }),
     ]);
 
@@ -314,7 +347,7 @@ export class CourseService {
       userId: dto.learnerId,
       cohortId: dto.cohortId,
       status: EnrollmentStatus.ACTIVE,
-    } as any);
+    } as CreationAttributes<Enrollment>);
   }
 
   async bulkEnrollLearners(
@@ -323,7 +356,9 @@ export class CourseService {
   ): Promise<{ enrolled: number; skipped: number }> {
     const [course, cohort] = await Promise.all([
       this.courseModel.findByPk(courseId, { attributes: ['id'] }),
-      this.cohortModel.findByPk(dto.cohortId, { attributes: ['id', 'courseId'] }),
+      this.cohortModel.findByPk(dto.cohortId, {
+        attributes: ['id', 'courseId'],
+      }),
     ]);
 
     if (!course) throw new NotFoundException('Course not found');
@@ -353,7 +388,9 @@ export class CourseService {
     });
     const alreadyEnrolled = new Set(existingEnrollments.map((e) => e.userId));
 
-    const newLearnerIds = dto.learnerIds.filter((id) => !alreadyEnrolled.has(id));
+    const newLearnerIds = dto.learnerIds.filter(
+      (id) => !alreadyEnrolled.has(id),
+    );
 
     if (newLearnerIds.length > 0) {
       await this.enrollmentModel.bulkCreate(
@@ -361,7 +398,7 @@ export class CourseService {
           userId,
           cohortId: dto.cohortId,
           status: EnrollmentStatus.ACTIVE,
-        })) as any[],
+        })) as CreationAttributes<Enrollment>[],
       );
     }
 
@@ -371,7 +408,11 @@ export class CourseService {
     };
   }
 
-  async removeLearner(courseId: string, cohortId: string, learnerId: string): Promise<void> {
+  async removeLearner(
+    courseId: string,
+    cohortId: string,
+    learnerId: string,
+  ): Promise<void> {
     // Verify cohort belongs to course
     const cohort = await this.cohortModel.findByPk(cohortId, {
       attributes: ['id', 'courseId'],
@@ -399,10 +440,12 @@ export class CourseService {
     courseId: string,
     cohortId?: string,
   ): Promise<{ cohortId: string; cohortName: string; learners: User[] }[]> {
-    const course = await this.courseModel.findByPk(courseId, { attributes: ['id'] });
+    const course = await this.courseModel.findByPk(courseId, {
+      attributes: ['id'],
+    });
     if (!course) throw new NotFoundException('Course not found');
 
-    const cohortWhere: any = { courseId };
+    const cohortWhere: WhereOptions<Cohort> = { courseId };
     if (cohortId) {
       cohortWhere.id = cohortId;
     }
@@ -420,7 +463,13 @@ export class CourseService {
             {
               model: User,
               as: 'learner',
-              attributes: ['id', 'firstName', 'lastName', 'email', 'phoneNumber'],
+              attributes: [
+                'id',
+                'firstName',
+                'lastName',
+                'email',
+                'phoneNumber',
+              ],
             },
           ],
         },
@@ -434,5 +483,106 @@ export class CourseService {
         ? cohort.enrollments.map((e) => e.learner)
         : [],
     }));
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  COURSE CONTENT MANAGEMENT
+  // ═══════════════════════════════════════════════════════════════
+
+  async createCourseContent(
+    courseId: string,
+    dto: CreateCourseContentDto,
+    userId: string,
+    role: UserRole,
+  ): Promise<CourseContent> {
+    await this.validateCourseAccess(courseId, userId, role);
+
+    if (dto.parentId) {
+      const parent = await this.courseContentModel.findByPk(dto.parentId);
+      if (!parent || parent.courseId !== courseId) {
+        throw new BadRequestException('Invalid parent content ID');
+      }
+    }
+
+    return this.courseContentModel.create({
+      ...dto,
+      courseId,
+    } as CreationAttributes<CourseContent>);
+  }
+
+  async updateCourseContent(
+    contentId: string,
+    dto: UpdateCourseContentDto,
+    userId: string,
+    role: UserRole,
+  ): Promise<CourseContent> {
+    const content = await this.courseContentModel.findByPk(contentId);
+    if (!content) throw new NotFoundException('Content not found');
+
+    await this.validateCourseAccess(content.courseId, userId, role);
+
+    if (dto.parentId) {
+      const parent = await this.courseContentModel.findByPk(dto.parentId);
+      if (!parent || parent.courseId !== content.courseId) {
+        throw new BadRequestException('Invalid parent content ID');
+      }
+    }
+
+    await content.update(dto);
+    return content;
+  }
+
+  async deleteCourseContent(
+    contentId: string,
+    userId: string,
+    role: UserRole,
+  ): Promise<void> {
+    const content = await this.courseContentModel.findByPk(contentId);
+    if (!content) throw new NotFoundException('Content not found');
+
+    await this.validateCourseAccess(content.courseId, userId, role);
+
+    await content.destroy();
+  }
+
+  async getCourseContents(courseId: string): Promise<CourseContent[]> {
+    const course = await this.courseModel.findByPk(courseId, {
+      attributes: ['id'],
+    });
+    if (!course) throw new NotFoundException('Course not found');
+
+    return this.courseContentModel.findAll({
+      where: { courseId, parentId: null },
+      include: [{ model: CourseContent, as: 'children' }],
+      order: [
+        ['sequenceOrder', 'ASC'],
+        [{ model: CourseContent, as: 'children' }, 'sequenceOrder', 'ASC'],
+      ],
+    });
+  }
+
+  /**
+   * Internal helper to validate if a user has access to manage a specific course's content.
+   * Access allowed for: SuperAdmin, Admin, and assigned Tutors.
+   */
+  private async validateCourseAccess(
+    courseId: string,
+    userId: string,
+    role: UserRole,
+  ): Promise<void> {
+    if (role === UserRole.SUPERADMIN || role === UserRole.ADMIN) {
+      return;
+    }
+
+    if (role === UserRole.TUTOR) {
+      const assignment = await this.courseTutorModel.findOne({
+        where: { courseId, tutorId: userId },
+      });
+      if (assignment) return;
+    }
+
+    throw new ForbiddenException(
+      'You do not have permission to manage this course content',
+    );
   }
 }

@@ -32,6 +32,8 @@ import {
   BulkAssignTutorsDto,
   EnrollLearnerDto,
   BulkEnrollLearnersDto,
+  CreateCourseContentDto,
+  UpdateCourseContentDto,
 } from '../dto/course.dto';
 
 @ApiTags('Courses')
@@ -87,7 +89,12 @@ export class CourseController {
     @Body() updateCourseDto: UpdateCourseDto,
     @NestRequest() req: Request & { user: { userId: string; role: UserRole } },
   ) {
-    return this.courseService.updateCourse(id, updateCourseDto, req.user.userId, req.user.role);
+    return this.courseService.updateCourse(
+      id,
+      updateCourseDto,
+      req.user.userId,
+      req.user.role,
+    );
   }
 
   @Delete(':id')
@@ -125,10 +132,7 @@ export class CourseController {
   @ApiResponse({ status: 201, description: 'Tutor assigned.' })
   @ApiResponse({ status: 404, description: 'Course or tutor not found.' })
   @ApiResponse({ status: 409, description: 'Tutor already assigned.' })
-  async assignTutor(
-    @Param('id') id: string,
-    @Body() dto: AssignTutorDto,
-  ) {
+  async assignTutor(@Param('id') id: string, @Body() dto: AssignTutorDto) {
     return this.courseService.assignTutor(id, dto);
   }
 
@@ -165,10 +169,19 @@ export class CourseController {
 
   @Get(':id/learners')
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TUTOR)
-  @ApiOperation({ summary: 'Get all learners for a course (optionally by cohort)' })
+  @ApiOperation({
+    summary: 'Get all learners for a course (optionally by cohort)',
+  })
   @ApiParam({ name: 'id', description: 'Course ID' })
-  @ApiQuery({ name: 'cohortId', required: false, description: 'Filter by cohort ID' })
-  @ApiResponse({ status: 200, description: 'List of learners grouped by cohort.' })
+  @ApiQuery({
+    name: 'cohortId',
+    required: false,
+    description: 'Filter by cohort ID',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of learners grouped by cohort.',
+  })
   async getLearners(
     @Param('id') id: string,
     @Query('cohortId') cohortId?: string,
@@ -181,12 +194,12 @@ export class CourseController {
   @ApiOperation({ summary: 'Enroll a learner in a course cohort' })
   @ApiParam({ name: 'id', description: 'Course ID' })
   @ApiResponse({ status: 201, description: 'Learner enrolled.' })
-  @ApiResponse({ status: 404, description: 'Course, cohort, or learner not found.' })
+  @ApiResponse({
+    status: 404,
+    description: 'Course, cohort, or learner not found.',
+  })
   @ApiResponse({ status: 409, description: 'Learner already enrolled.' })
-  async enrollLearner(
-    @Param('id') id: string,
-    @Body() dto: EnrollLearnerDto,
-  ) {
+  async enrollLearner(@Param('id') id: string, @Body() dto: EnrollLearnerDto) {
     return this.courseService.enrollLearner(id, dto);
   }
 
@@ -217,5 +230,77 @@ export class CourseController {
   ) {
     await this.courseService.removeLearner(id, cohortId, learnerId);
     return { message: 'Learner removed from cohort successfully' };
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  COURSE CONTENT MANAGEMENT
+  // ═══════════════════════════════════════════════════════════════
+
+  @Get(':id/contents')
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TUTOR, UserRole.LEARNER)
+  @ApiOperation({ summary: 'Get all contents for a course (tree structure)' })
+  @ApiParam({ name: 'id', description: 'Course ID' })
+  @ApiResponse({ status: 200, description: 'List of course contents.' })
+  async getContents(@Param('id') id: string) {
+    return this.courseService.getCourseContents(id);
+  }
+
+  @Post(':id/contents')
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TUTOR)
+  @ApiOperation({
+    summary: 'Create course content (Admin/Assigned Tutor only)',
+  })
+  @ApiParam({ name: 'id', description: 'Course ID' })
+  @ApiResponse({ status: 201, description: 'Content created.' })
+  async createContent(
+    @Param('id') id: string,
+    @Body() dto: CreateCourseContentDto,
+    @NestRequest() req: Request & { user: { userId: string; role: UserRole } },
+  ) {
+    return this.courseService.createCourseContent(
+      id,
+      dto,
+      req.user.userId,
+      req.user.role,
+    );
+  }
+
+  @Put('contents/:contentId')
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TUTOR)
+  @ApiOperation({
+    summary: 'Update course content (Admin/Assigned Tutor only)',
+  })
+  @ApiParam({ name: 'contentId', description: 'Course Content ID' })
+  @ApiResponse({ status: 200, description: 'Content updated.' })
+  async updateContent(
+    @Param('contentId') contentId: string,
+    @Body() dto: UpdateCourseContentDto,
+    @NestRequest() req: Request & { user: { userId: string; role: UserRole } },
+  ) {
+    return this.courseService.updateCourseContent(
+      contentId,
+      dto,
+      req.user.userId,
+      req.user.role,
+    );
+  }
+
+  @Delete('contents/:contentId')
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TUTOR)
+  @ApiOperation({
+    summary: 'Delete course content (Admin/Assigned Tutor only)',
+  })
+  @ApiParam({ name: 'contentId', description: 'Course Content ID' })
+  @ApiResponse({ status: 200, description: 'Content deleted.' })
+  async removeContent(
+    @Param('contentId') contentId: string,
+    @NestRequest() req: Request & { user: { userId: string; role: UserRole } },
+  ) {
+    await this.courseService.deleteCourseContent(
+      contentId,
+      req.user.userId,
+      req.user.role,
+    );
+    return { message: 'Course content deleted successfully' };
   }
 }

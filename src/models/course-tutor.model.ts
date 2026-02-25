@@ -60,5 +60,5 @@ export class CourseTutor extends Model<CourseTutor> {
   declare updatedAt: Date;
 
   @DeletedAt
-  declare deletedAt: Date;
+  declare deletedAt: Date | null;
 }

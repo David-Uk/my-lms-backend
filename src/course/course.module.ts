@@ -5,6 +5,7 @@ import { CourseService } from './course.service';
 import {
   Course,
   CourseTutor,
+  CourseContent,
   Cohort,
   Enrollment,
   User,
@@ -15,6 +16,7 @@ import {
     SequelizeModule.forFeature([
       Course,
       CourseTutor,
+      CourseContent,
       Cohort,
       Enrollment,
       User,

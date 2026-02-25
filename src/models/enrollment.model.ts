@@ -63,7 +63,7 @@ export class Enrollment extends Model<Enrollment> {
     type: DataType.UUID,
     comment: 'Pointer to where the learner stopped',
   })
-  lastAccessedContentId: string;
+  lastAccessedContentId: string | null;
 
   @BelongsTo(() => CourseContent)
   lastAccessedContent: CourseContent;

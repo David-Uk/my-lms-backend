@@ -55,7 +55,7 @@ export class CourseContent extends Model<CourseContent> {
   @Column({
     type: DataType.UUID,
   })
-  parentId: string;
+  parentId: string | null;
 
   @BelongsTo(() => CourseContent)
   parent: CourseContent;
