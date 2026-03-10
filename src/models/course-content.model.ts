@@ -14,6 +14,7 @@ import {
 } from 'sequelize-typescript';
 import { Course } from './course.model';
 import { Lesson } from './lesson.model';
+import { Assessment } from './assessment.model';
 
 export enum ContentType {
   SECTION = 'section',
@@ -78,6 +79,9 @@ export class CourseContent extends Model<CourseContent> {
 
   @HasOne(() => Lesson)
   lesson: Lesson;
+
+  @HasOne(() => Assessment)
+  assessment: Assessment;
 
   @CreatedAt
   declare createdAt: Date;
