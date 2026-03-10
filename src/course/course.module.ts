@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { CourseController } from './course.controller';
 import { CourseService } from './course.service';
+import { AssessmentController } from './assessment.controller';
+import { AssessmentService } from './assessment.service';
 import {
   Course,
   CourseTutor,
@@ -9,6 +11,12 @@ import {
   Cohort,
   Enrollment,
   User,
+  Assessment,
+  Quiz,
+  QuizQuestion,
+  CodeChallenge,
+  QuizSession,
+  QuizParticipantAnswer,
 } from '../models';
 
 @Module({
@@ -20,10 +28,16 @@ import {
       Cohort,
       Enrollment,
       User,
+      Assessment,
+      Quiz,
+      QuizQuestion,
+      CodeChallenge,
+      QuizSession,
+      QuizParticipantAnswer,
     ]),
   ],
-  controllers: [CourseController],
-  providers: [CourseService],
-  exports: [CourseService],
+  controllers: [CourseController, AssessmentController],
+  providers: [CourseService, AssessmentService],
+  exports: [CourseService, AssessmentService],
 })
 export class CourseModule {}

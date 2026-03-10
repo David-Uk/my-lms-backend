@@ -8,18 +8,16 @@ import {
   DeletedAt,
   ForeignKey,
   BelongsTo,
-  HasMany,
   AllowNull,
 } from 'sequelize-typescript';
 import { Assessment } from './assessment.model';
-import { QuizQuestion } from './quiz-question.model';
 
 @Table({
-  tableName: 'quizzes',
+  tableName: 'code_challenges',
   timestamps: true,
   paranoid: true,
 })
-export class Quiz extends Model<Quiz> {
+export class CodeChallenge extends Model<CodeChallenge> {
   @Column({
     type: DataType.UUID,
     defaultValue: DataType.UUIDV4,
@@ -39,32 +37,27 @@ export class Quiz extends Model<Quiz> {
 
   @AllowNull(false)
   @Column({
-    type: DataType.INTEGER,
-    comment: 'Time allocated in minutes',
+    type: DataType.STRING,
   })
-  timeAllocated: number;
+  language: string;
 
   @AllowNull(false)
   @Column({
-    type: DataType.FLOAT,
+    type: DataType.TEXT,
   })
-  passMark: number;
+  problemStatement: string;
 
   @Column({
-    type: DataType.BOOLEAN,
-    defaultValue: false,
-    comment: 'Is this a group/kahoot quiz?',
+    type: DataType.TEXT,
   })
-  isGroup: boolean;
+  boilerplateCode: string;
 
+  @AllowNull(false)
   @Column({
-    type: DataType.STRING(6),
-    comment: 'Access PIN for group quiz sessions',
+    type: DataType.JSONB,
+    comment: 'Array of test cases: { input: string, expectedOutput: string, isHidden: boolean }',
   })
-  groupPin: string;
-
-  @HasMany(() => QuizQuestion)
-  questions: QuizQuestion[];
+  testCases: any;
 
   @CreatedAt
   declare createdAt: Date;

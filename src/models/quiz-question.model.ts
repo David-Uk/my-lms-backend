@@ -77,6 +77,12 @@ export class QuizQuestion extends Model<QuizQuestion> {
   })
   marks: number;
 
+  @Column({
+    type: DataType.INTEGER,
+    comment: 'Time limit for this specific question in seconds (for Kahoot style)',
+  })
+  timeLimit: number;
+
   @CreatedAt
   declare createdAt: Date;
 

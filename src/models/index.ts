@@ -10,3 +10,9 @@ export { Quiz } from './quiz.model';
 export { QuizQuestion, QuestionType } from './quiz-question.model';
 export { Attendance, AttendanceStatus } from './attendance.model';
 export { CourseTutor } from './course-tutor.model';
+export { CodeChallenge } from './code-challenge.model';
+export {
+  QuizSession,
+  QuizParticipantAnswer,
+  QuizSessionStatus,
+} from './quiz-session.model';

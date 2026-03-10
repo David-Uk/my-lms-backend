@@ -13,11 +13,14 @@ import {
 } from 'sequelize-typescript';
 import { CourseContent } from './course-content.model';
 import { Quiz } from './quiz.model';
+import { CodeChallenge } from './code-challenge.model';
 
 export enum AssessmentType {
   QUIZ = 'quiz',
   ASSIGNMENT = 'assignment',
   GROUP_ASSIGNMENT = 'group_assignment',
+  CODE_CHALLENGE = 'code_challenge',
+  KAHOOT_QUIZ = 'kahoot_quiz',
 }
 
 @Table({
@@ -61,6 +64,9 @@ export class Assessment extends Model<Assessment> {
 
   @HasOne(() => Quiz)
   quiz: Quiz;
+
+  @HasOne(() => CodeChallenge)
+  codeChallenge: CodeChallenge;
 
   @CreatedAt
   declare createdAt: Date;
