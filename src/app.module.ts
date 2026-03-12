@@ -21,6 +21,7 @@ import {
   CodeChallenge,
   QuizSession,
   QuizParticipantAnswer,
+  CodeChallengeSubmission,
 } from './models';
 
 @Module({
@@ -57,6 +58,7 @@ import {
           CodeChallenge,
           QuizSession,
           QuizParticipantAnswer,
+          CodeChallengeSubmission,
         ],
       }),
       inject: [ConfigService],

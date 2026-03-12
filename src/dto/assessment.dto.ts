@@ -184,3 +184,13 @@ export class SubmitQuizAnswerDto {
   @Min(0)
   responseTimeMs: number;
 }
+
+export class SubmitCodeChallengeDto {
+  @ApiProperty({
+    example: 'function sum(a, b) {\n  return a + b;\n}',
+    description: 'The submitted code',
+  })
+  @IsNotEmpty()
+  @IsString()
+  code: string;
+}

@@ -30,6 +30,7 @@ import {
   CreateQuizQuestionDto,
   CreateQuizSessionDto,
   SubmitQuizAnswerDto,
+  SubmitCodeChallengeDto,
 } from '../dto/assessment.dto';
 import { QuizSessionStatus } from '../models';
 
@@ -145,5 +146,36 @@ export class AssessmentController {
   @ApiOperation({ summary: 'Get current leaderboard for a quiz session' })
   async getLeaderboard(@Param('sessionId') sessionId: string) {
     return this.assessmentService.getLeaderboard(sessionId);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  CODE CHALLENGE SUBMISSIONS
+  // ═══════════════════════════════════════════════════════════════
+
+  @Post('code-challenge/:challengeId/submit')
+  @Roles(UserRole.LEARNER)
+  @ApiOperation({ summary: 'Submit code for a challenge and evaluate' })
+  async submitCode(
+    @Param('challengeId') challengeId: string,
+    @Body() dto: SubmitCodeChallengeDto,
+    @NestRequest() req: Request & { user: { userId: string } },
+  ) {
+    return this.assessmentService.submitCodeChallenge(
+      challengeId,
+      req.user.userId,
+      dto,
+    );
+  }
+
+  @Post('code-challenge/:challengeId/test')
+  @Roles(UserRole.TUTOR, UserRole.ADMIN, UserRole.SUPERADMIN)
+  @ApiOperation({
+    summary: 'Test code challenge without creating a submission',
+  })
+  async testCode(
+    @Param('challengeId') challengeId: string,
+    @Body() dto: SubmitCodeChallengeDto,
+  ) {
+    return this.assessmentService.testCodeChallenge(challengeId, dto);
   }
 }

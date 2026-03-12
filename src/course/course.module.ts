@@ -17,6 +17,7 @@ import {
   CodeChallenge,
   QuizSession,
   QuizParticipantAnswer,
+  CodeChallengeSubmission,
 } from '../models';
 
 @Module({
@@ -34,6 +35,7 @@ import {
       CodeChallenge,
       QuizSession,
       QuizParticipantAnswer,
+      CodeChallengeSubmission,
     ]),
   ],
   controllers: [CourseController, AssessmentController],

@@ -16,3 +16,4 @@ export {
   QuizParticipantAnswer,
   QuizSessionStatus,
 } from './quiz-session.model';
+export { CodeChallengeSubmission } from './code-challenge-submission.model';
