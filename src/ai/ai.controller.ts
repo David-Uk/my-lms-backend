@@ -90,4 +90,35 @@ export class AiController {
     const flashcards = await this.aiService.generateFlashcards(body.topic);
     return flashcards;
   }
+
+  @Post('analyze-performance')
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @ApiOperation({ summary: 'Analyze student performance (Admin only)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Student performance analysis with AI insights.',
+    schema: {
+      type: 'object',
+      properties: {
+        summary: { type: 'string', description: 'Overall performance summary' },
+        insights: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Key insights about student performance',
+        },
+        recommendations: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Actionable recommendations',
+        },
+        rawData: {
+          type: 'object',
+          description: 'Raw performance metrics',
+        },
+      },
+    },
+  })
+  async analyzeStudentPerformance() {
+    return await this.aiService.analyzeStudentPerformance();
+  }
 }

@@ -69,7 +69,7 @@ export class AiProcessor {
       const prompt = `Generate a quiz on the topic: ${topic}. Provide 5 multiple-choice questions with 4 options each, and indicate the correct answer. Format as JSON with structure: { questions: [{ question: string, options: [string], correctAnswer: string }] }`;
 
       const response = await ollama.generate({
-        model: 'llama2',
+        model: 'llama3.2',
         prompt: prompt,
         options: {
           temperature: 0.7,
@@ -95,7 +95,7 @@ export class AiProcessor {
       const prompt = `Generate 10 flashcards on the topic: ${topic}. Each flashcard should have a front (question) and back (answer). Format as JSON with structure: { flashcards: [{ front: string, back: string }] }`;
 
       const response = await ollama.generate({
-        model: 'llama2',
+        model: 'llama3.2',
         prompt: prompt,
         options: {
           temperature: 0.7,
