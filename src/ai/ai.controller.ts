@@ -84,6 +84,7 @@ export class AiController {
       },
     },
   })
+  @ApiResponse({ status: 200, description: 'Generated flashcards.' })
   async generateFlashcards(
     @Body() body: { topic: string },
   ): Promise<Flashcards> {

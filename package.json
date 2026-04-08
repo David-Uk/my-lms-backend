@@ -20,7 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migration:generate": "npx sequelize-cli migration:generate",
     "migration:run": "npx sequelize-cli db:migrate",
-    "migration:revert": "npx sequelize-cli db:migrate:undo"
+    "migration:revert": "npx sequelize-cli db:migrate:undo",
+    "generate:spec": "ts-node -r tsconfig-paths/register src/generate-spec.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

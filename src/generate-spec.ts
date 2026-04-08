@@ -1,23 +1,16 @@
+/**
+ * Standalone script to regenerate swagger.json and postman_collection.json
+ * without starting the HTTP server.
+ *
+ * Usage:  npx ts-node -r tsconfig-paths/register src/generate-spec.ts
+ */
 import { NestFactory } from '@nestjs/core';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import * as fs from 'fs';
+import { setupSwagger } from './common/swagger.config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-
-  const config = new DocumentBuilder()
-    .setTitle('LMS API')
-    .setDescription('The Learning Management System API description')
-    .setVersion('1.0')
-    .addTag('lms')
-    .addBearerAuth()
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
-  fs.writeFileSync('./swagger.json', JSON.stringify(document, null, 2));
-
-  console.log('Swagger JSON generated at ./swagger.json');
+  const app = await NestFactory.create(AppModule, { logger: false });
+  setupSwagger(app);
   await app.close();
 }
 bootstrap();

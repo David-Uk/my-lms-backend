@@ -16,6 +16,7 @@ import {
   ApiResponse,
   ApiBearerAuth,
   ApiParam,
+  ApiBody,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -39,7 +40,7 @@ import { QuizSessionStatus } from '../models';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class AssessmentController {
-  constructor(private readonly assessmentService: AssessmentService) {}
+  constructor(private readonly assessmentService: AssessmentService) { }
 
   @Post('content/:contentId')
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TUTOR)
@@ -108,6 +109,8 @@ export class AssessmentController {
   @Post('sessions')
   @Roles(UserRole.TUTOR, UserRole.ADMIN, UserRole.SUPERADMIN)
   @ApiOperation({ summary: 'Create a new group quiz session' })
+  @ApiResponse({ status: 201, description: 'Quiz session created.' })
+  @ApiResponse({ status: 404, description: 'Quiz or cohort not found.' })
   async createSession(
     @Body() dto: CreateQuizSessionDto,
     @NestRequest() req: Request & { user: { userId: string } },
@@ -119,6 +122,21 @@ export class AssessmentController {
   @Roles(UserRole.TUTOR, UserRole.ADMIN, UserRole.SUPERADMIN)
   @ApiOperation({ summary: 'Update status of a quiz session' })
   @ApiParam({ name: 'sessionId', description: 'Quiz Session ID' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        status: {
+          type: 'string',
+          enum: ['waiting', 'active', 'completed'],
+          description: 'New session status',
+        },
+      },
+      required: ['status'],
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Session status updated.' })
+  @ApiResponse({ status: 404, description: 'Session not found.' })
   async updateStatus(
     @Param('sessionId') sessionId: string,
     @Body('status') status: QuizSessionStatus,
@@ -129,6 +147,9 @@ export class AssessmentController {
   @Post('sessions/:sessionId/submit')
   @Roles(UserRole.LEARNER)
   @ApiOperation({ summary: 'Submit an answer to an active quiz session' })
+  @ApiParam({ name: 'sessionId', description: 'Quiz Session ID' })
+  @ApiResponse({ status: 201, description: 'Answer submitted.' })
+  @ApiResponse({ status: 404, description: 'Session not found.' })
   async submitAnswer(
     @Param('sessionId') sessionId: string,
     @Body() dto: SubmitQuizAnswerDto,
@@ -144,6 +165,9 @@ export class AssessmentController {
   @Get('sessions/:sessionId/leaderboard')
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TUTOR, UserRole.LEARNER)
   @ApiOperation({ summary: 'Get current leaderboard for a quiz session' })
+  @ApiParam({ name: 'sessionId', description: 'Quiz Session ID' })
+  @ApiResponse({ status: 200, description: 'Leaderboard data.' })
+  @ApiResponse({ status: 404, description: 'Session not found.' })
   async getLeaderboard(@Param('sessionId') sessionId: string) {
     return this.assessmentService.getLeaderboard(sessionId);
   }
@@ -155,6 +179,9 @@ export class AssessmentController {
   @Post('code-challenge/:challengeId/submit')
   @Roles(UserRole.LEARNER)
   @ApiOperation({ summary: 'Submit code for a challenge and evaluate' })
+  @ApiParam({ name: 'challengeId', description: 'Code Challenge ID' })
+  @ApiResponse({ status: 201, description: 'Code submitted and evaluated.' })
+  @ApiResponse({ status: 404, description: 'Challenge not found.' })
   async submitCode(
     @Param('challengeId') challengeId: string,
     @Body() dto: SubmitCodeChallengeDto,
@@ -172,6 +199,9 @@ export class AssessmentController {
   @ApiOperation({
     summary: 'Test code challenge without creating a submission',
   })
+  @ApiParam({ name: 'challengeId', description: 'Code Challenge ID' })
+  @ApiResponse({ status: 201, description: 'Test results returned.' })
+  @ApiResponse({ status: 404, description: 'Challenge not found.' })
   async testCode(
     @Param('challengeId') challengeId: string,
     @Body() dto: SubmitCodeChallengeDto,

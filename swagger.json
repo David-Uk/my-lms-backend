@@ -1,0 +1,2331 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "API is running."
+          }
+        },
+        "summary": "Health check",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/auth/super-admin/signup": {
+      "post": {
+        "operationId": "AuthController_signup",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The super admin has been successfully created."
+          },
+          "400": {
+            "description": "Bad Request."
+          }
+        },
+        "summary": "Create a super admin account",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/signup": {
+      "post": {
+        "operationId": "AuthController_learnerSignup",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The learner has been successfully created."
+          },
+          "400": {
+            "description": "Bad Request."
+          }
+        },
+        "summary": "Create a learner account",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful, returns JWT token."
+          },
+          "401": {
+            "description": "Unauthorized."
+          }
+        },
+        "summary": "Login to the application",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "operationId": "AuthController_forgotPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset email sent if user exists."
+          }
+        },
+        "summary": "Request password reset",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "operationId": "AuthController_resetPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successful."
+          },
+          "400": {
+            "description": "Invalid or expired token."
+          }
+        },
+        "summary": "Reset password using token",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/profile": {
+      "put": {
+        "operationId": "AuthController_updateProfile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully."
+          },
+          "401": {
+            "description": "Unauthorized."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update user profile",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/users": {
+      "post": {
+        "operationId": "UsersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The user has been successfully created."
+          },
+          "403": {
+            "description": "Forbidden. Requires Admin or SuperAdmin role."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new user (Admin/SuperAdmin only)",
+        "tags": [
+          "Users"
+        ]
+      },
+      "get": {
+        "operationId": "UsersController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of all users."
+          },
+          "403": {
+            "description": "Forbidden. Requires Admin or SuperAdmin role."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all users (Admin/SuperAdmin only)",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "operationId": "UsersController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The found user."
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "User not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a specific user by ID",
+        "tags": [
+          "Users"
+        ]
+      },
+      "put": {
+        "operationId": "UsersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The user has been successfully updated."
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "User not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a user by ID",
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "operationId": "UsersController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The user has been successfully deleted."
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "User not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a user by ID",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/courses": {
+      "post": {
+        "operationId": "CourseController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCourseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Course created successfully."
+          },
+          "403": {
+            "description": "Forbidden."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new course (Admin only)",
+        "tags": [
+          "Courses"
+        ]
+      },
+      "get": {
+        "operationId": "CourseController_findAll",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by title",
+            "schema": {
+              "example": "typescript",
+              "type": "string"
+            }
+          },
+          {
+            "name": "difficultyLevel",
+            "required": false,
+            "in": "query",
+            "description": "Filter by difficulty level",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "beginner",
+                "intermediate",
+                "advanced"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of courses."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all courses (paginated)",
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/courses/{id}": {
+      "get": {
+        "operationId": "CourseController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Course ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Course details."
+          },
+          "404": {
+            "description": "Course not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a course by ID",
+        "tags": [
+          "Courses"
+        ]
+      },
+      "put": {
+        "operationId": "CourseController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Course ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCourseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Course updated."
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Course not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a course (Admin only)",
+        "tags": [
+          "Courses"
+        ]
+      },
+      "delete": {
+        "operationId": "CourseController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Course ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Course deleted."
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Course not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a course (Admin only)",
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/courses/{id}/tutors": {
+      "get": {
+        "operationId": "CourseController_getTutors",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Course ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tutors."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all tutors for a course",
+        "tags": [
+          "Courses"
+        ]
+      },
+      "post": {
+        "operationId": "CourseController_assignTutor",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Course ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignTutorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tutor assigned."
+          },
+          "404": {
+            "description": "Course or tutor not found."
+          },
+          "409": {
+            "description": "Tutor already assigned."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Assign a tutor to a course",
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/courses/{id}/tutors/bulk": {
+      "post": {
+        "operationId": "CourseController_bulkAssignTutors",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Course ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkAssignTutorsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tutors assigned."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Bulk assign tutors to a course",
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/courses/{id}/tutors/{tutorId}": {
+      "delete": {
+        "operationId": "CourseController_removeTutor",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Course ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tutorId",
+            "required": true,
+            "in": "path",
+            "description": "Tutor ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tutor removed."
+          },
+          "404": {
+            "description": "Assignment not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove a tutor from a course",
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/courses/{id}/learners": {
+      "get": {
+        "operationId": "CourseController_getLearners",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Course ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cohortId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by cohort ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of learners grouped by cohort."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all learners for a course (optionally by cohort)",
+        "tags": [
+          "Courses"
+        ]
+      },
+      "post": {
+        "operationId": "CourseController_enrollLearner",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Course ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollLearnerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Learner enrolled."
+          },
+          "404": {
+            "description": "Course, cohort, or learner not found."
+          },
+          "409": {
+            "description": "Learner already enrolled."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Enroll a learner in a course cohort",
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/courses/{id}/learners/bulk": {
+      "post": {
+        "operationId": "CourseController_bulkEnrollLearners",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Course ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkEnrollLearnersDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Learners enrolled."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Bulk enroll learners in a course cohort",
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/courses/{id}/learners/{cohortId}/{learnerId}": {
+      "delete": {
+        "operationId": "CourseController_removeLearner",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Course ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cohortId",
+            "required": true,
+            "in": "path",
+            "description": "Cohort ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "learnerId",
+            "required": true,
+            "in": "path",
+            "description": "Learner ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Learner removed."
+          },
+          "404": {
+            "description": "Enrollment not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove a learner from a course cohort",
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/courses/{id}/contents": {
+      "get": {
+        "operationId": "CourseController_getContents",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Course ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of course contents."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all contents for a course (tree structure)",
+        "tags": [
+          "Courses"
+        ]
+      },
+      "post": {
+        "operationId": "CourseController_createContent",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Course ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCourseContentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Content created."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create course content (Admin/Assigned Tutor only)",
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/courses/contents/{contentId}": {
+      "put": {
+        "operationId": "CourseController_updateContent",
+        "parameters": [
+          {
+            "name": "contentId",
+            "required": true,
+            "in": "path",
+            "description": "Course Content ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCourseContentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Content updated."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update course content (Admin/Assigned Tutor only)",
+        "tags": [
+          "Courses"
+        ]
+      },
+      "delete": {
+        "operationId": "CourseController_removeContent",
+        "parameters": [
+          {
+            "name": "contentId",
+            "required": true,
+            "in": "path",
+            "description": "Course Content ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Content deleted."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete course content (Admin/Assigned Tutor only)",
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/assessments/content/{contentId}": {
+      "post": {
+        "operationId": "AssessmentController_create",
+        "parameters": [
+          {
+            "name": "contentId",
+            "required": true,
+            "in": "path",
+            "description": "Course Content ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAssessmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Assessment created successfully."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new assessment for a course content",
+        "tags": [
+          "Assessments"
+        ]
+      }
+    },
+    "/assessments/{id}": {
+      "put": {
+        "operationId": "AssessmentController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Assessment ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAssessmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update assessment basics",
+        "tags": [
+          "Assessments"
+        ]
+      },
+      "get": {
+        "operationId": "AssessmentController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Assessment ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get assessment details including quiz or code challenge",
+        "tags": [
+          "Assessments"
+        ]
+      }
+    },
+    "/assessments/{id}/quiz": {
+      "post": {
+        "operationId": "AssessmentController_createQuiz",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Assessment ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuizDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add a quiz to an assessment",
+        "tags": [
+          "Assessments"
+        ]
+      }
+    },
+    "/assessments/quiz/{quizId}/questions": {
+      "post": {
+        "operationId": "AssessmentController_addQuestion",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "in": "path",
+            "description": "Quiz ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuizQuestionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add a question to a quiz",
+        "tags": [
+          "Assessments"
+        ]
+      }
+    },
+    "/assessments/{id}/code-challenge": {
+      "post": {
+        "operationId": "AssessmentController_createCodeChallenge",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Assessment ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCodeChallengeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add a code challenge to an assessment",
+        "tags": [
+          "Assessments"
+        ]
+      }
+    },
+    "/assessments/sessions": {
+      "post": {
+        "operationId": "AssessmentController_createSession",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuizSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Quiz session created."
+          },
+          "404": {
+            "description": "Quiz or cohort not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new group quiz session",
+        "tags": [
+          "Assessments"
+        ]
+      }
+    },
+    "/assessments/sessions/{sessionId}/status": {
+      "patch": {
+        "operationId": "AssessmentController_updateStatus",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "description": "Quiz Session ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "waiting",
+                      "active",
+                      "completed"
+                    ],
+                    "description": "New session status"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session status updated."
+          },
+          "404": {
+            "description": "Session not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update status of a quiz session",
+        "tags": [
+          "Assessments"
+        ]
+      }
+    },
+    "/assessments/sessions/{sessionId}/submit": {
+      "post": {
+        "operationId": "AssessmentController_submitAnswer",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "description": "Quiz Session ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitQuizAnswerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Answer submitted."
+          },
+          "404": {
+            "description": "Session not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Submit an answer to an active quiz session",
+        "tags": [
+          "Assessments"
+        ]
+      }
+    },
+    "/assessments/sessions/{sessionId}/leaderboard": {
+      "get": {
+        "operationId": "AssessmentController_getLeaderboard",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "description": "Quiz Session ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Leaderboard data."
+          },
+          "404": {
+            "description": "Session not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current leaderboard for a quiz session",
+        "tags": [
+          "Assessments"
+        ]
+      }
+    },
+    "/assessments/code-challenge/{challengeId}/submit": {
+      "post": {
+        "operationId": "AssessmentController_submitCode",
+        "parameters": [
+          {
+            "name": "challengeId",
+            "required": true,
+            "in": "path",
+            "description": "Code Challenge ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitCodeChallengeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Code submitted and evaluated."
+          },
+          "404": {
+            "description": "Challenge not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Submit code for a challenge and evaluate",
+        "tags": [
+          "Assessments"
+        ]
+      }
+    },
+    "/assessments/code-challenge/{challengeId}/test": {
+      "post": {
+        "operationId": "AssessmentController_testCode",
+        "parameters": [
+          {
+            "name": "challengeId",
+            "required": true,
+            "in": "path",
+            "description": "Code Challenge ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitCodeChallengeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Test results returned."
+          },
+          "404": {
+            "description": "Challenge not found."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Test code challenge without creating a submission",
+        "tags": [
+          "Assessments"
+        ]
+      }
+    },
+    "/ai/transcribe": {
+      "post": {
+        "operationId": "AiController_transcribe",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Audio file (wav, mp3, etc.)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transcription result."
+          },
+          "400": {
+            "description": "Invalid file."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Transcribe audio file to text",
+        "tags": [
+          "AI"
+        ]
+      }
+    },
+    "/ai/quiz": {
+      "post": {
+        "operationId": "AiController_generateQuiz",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "topic": {
+                    "type": "string",
+                    "description": "Topic for the quiz"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Generated quiz."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Generate a quiz on a topic",
+        "tags": [
+          "AI"
+        ]
+      }
+    },
+    "/ai/flashcards": {
+      "post": {
+        "operationId": "AiController_generateFlashcards",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "topic": {
+                    "type": "string",
+                    "description": "Topic for the flashcards"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Generated flashcards."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Generate flashcards on a topic",
+        "tags": [
+          "AI"
+        ]
+      }
+    },
+    "/ai/analyze-performance": {
+      "post": {
+        "operationId": "AiController_analyzeStudentPerformance",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Student performance analysis with AI insights.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "summary": {
+                      "type": "string",
+                      "description": "Overall performance summary"
+                    },
+                    "insights": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Key insights about student performance"
+                    },
+                    "recommendations": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Actionable recommendations"
+                    },
+                    "rawData": {
+                      "type": "object",
+                      "description": "Raw performance metrics"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Analyze student performance (Admin only)",
+        "tags": [
+          "AI"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "LMS API",
+    "description": "## Learning Management System REST API\n\nThis API powers the LMS platform, supporting:\n- **Authentication** – signup, login, password reset\n- **Users** – CRUD for all user roles (SuperAdmin, Admin, Tutor, Learner)\n- **Courses** – course management, tutor assignment, learner enrollment, content tree\n- **Assessments** – quizzes, code challenges, group Kahoot-style sessions\n- **AI** – audio transcription, quiz/flashcard generation, performance analysis\n\n### Authentication\nAll protected endpoints require a **Bearer JWT token**.  \nObtain a token via `POST /auth/login` and pass it as:\n```\nAuthorization: Bearer <token>\n```\n\n### Roles\n| Role | Description |\n|------|-------------|\n| `superadmin` | Full access |\n| `admin` | Manage courses, users, assessments |\n| `tutor` | Manage assigned course content |\n| `learner` | View content, submit assessments |\n",
+    "version": "1.0",
+    "contact": {
+      "name": "LMS Team",
+      "url": "",
+      "email": "support@lms.example.com"
+    }
+  },
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "Signup, login, and password management"
+    },
+    {
+      "name": "Users",
+      "description": "User CRUD operations"
+    },
+    {
+      "name": "Courses",
+      "description": "Course management, tutors, learners, and content"
+    },
+    {
+      "name": "Assessments",
+      "description": "Quizzes, code challenges, and group sessions"
+    },
+    {
+      "name": "AI",
+      "description": "AI-powered features: transcription, quiz/flashcard generation"
+    }
+  ],
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local Development"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "JWT": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http",
+        "name": "Authorization",
+        "description": "Enter your JWT token",
+        "in": "header"
+      }
+    },
+    "schemas": {
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "John",
+            "description": "The first name of the user"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe",
+            "description": "The last name of the user"
+          },
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com",
+            "description": "The email of the user"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123",
+            "description": "The password of the user",
+            "minLength": 8
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "superadmin",
+              "admin",
+              "tutor",
+              "learner"
+            ],
+            "description": "The role of the user"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive",
+              "suspended"
+            ],
+            "description": "The status of the user"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "+1234567890",
+            "description": "The phone number of the user"
+          },
+          "bio": {
+            "type": "string",
+            "example": "A short bio",
+            "description": "The bio of the user"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "email",
+          "password"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com",
+            "description": "The email of the user"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123",
+            "description": "The password of the user"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "ForgotPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com",
+            "description": "The email of the user"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com",
+            "description": "The email of the user"
+          },
+          "token": {
+            "type": "string",
+            "example": "token123",
+            "description": "Reset token sent to email"
+          },
+          "newPassword": {
+            "type": "string",
+            "example": "newPassword123",
+            "description": "New password for the user",
+            "minLength": 8
+          }
+        },
+        "required": [
+          "email",
+          "token",
+          "newPassword"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "John",
+            "description": "The first name of the user"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe",
+            "description": "The last name of the user"
+          },
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com",
+            "description": "The email of the user"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123",
+            "description": "The password of the user",
+            "minLength": 8
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "superadmin",
+              "admin",
+              "tutor",
+              "learner"
+            ],
+            "description": "The role of the user"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive",
+              "suspended"
+            ],
+            "description": "The status of the user"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "+1234567890",
+            "description": "The phone number of the user"
+          },
+          "bio": {
+            "type": "string",
+            "example": "A short bio",
+            "description": "The bio of the user"
+          },
+          "profilePicture": {
+            "type": "string",
+            "example": "https://example.com/profile.jpg",
+            "description": "The profile picture of the user"
+          }
+        }
+      },
+      "CreateCourseDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Introduction to TypeScript",
+            "description": "Course title"
+          },
+          "description": {
+            "type": "string",
+            "example": "Learn TypeScript from scratch",
+            "description": "Course description"
+          },
+          "difficultyLevel": {
+            "type": "string",
+            "enum": [
+              "beginner",
+              "intermediate",
+              "advanced"
+            ],
+            "example": "beginner",
+            "description": "Difficulty level"
+          }
+        },
+        "required": [
+          "title",
+          "difficultyLevel"
+        ]
+      },
+      "UpdateCourseDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Advanced TypeScript",
+            "description": "Course title"
+          },
+          "description": {
+            "type": "string",
+            "example": "Deep dive into TypeScript",
+            "description": "Course description"
+          },
+          "difficultyLevel": {
+            "type": "string",
+            "enum": [
+              "beginner",
+              "intermediate",
+              "advanced"
+            ],
+            "description": "Difficulty level"
+          }
+        }
+      },
+      "AssignTutorDto": {
+        "type": "object",
+        "properties": {
+          "tutorId": {
+            "type": "string",
+            "example": "uuid-of-tutor",
+            "description": "ID of the tutor to assign"
+          }
+        },
+        "required": [
+          "tutorId"
+        ]
+      },
+      "BulkAssignTutorsDto": {
+        "type": "object",
+        "properties": {
+          "tutorIds": {
+            "example": [
+              "uuid-1",
+              "uuid-2"
+            ],
+            "description": "Array of tutor IDs to assign",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "tutorIds"
+        ]
+      },
+      "EnrollLearnerDto": {
+        "type": "object",
+        "properties": {
+          "learnerId": {
+            "type": "string",
+            "example": "uuid-of-learner",
+            "description": "ID of the learner to enroll"
+          },
+          "cohortId": {
+            "type": "string",
+            "example": "uuid-of-cohort",
+            "description": "ID of the cohort to enroll into"
+          }
+        },
+        "required": [
+          "learnerId",
+          "cohortId"
+        ]
+      },
+      "BulkEnrollLearnersDto": {
+        "type": "object",
+        "properties": {
+          "learnerIds": {
+            "example": [
+              "uuid-1",
+              "uuid-2"
+            ],
+            "description": "Array of learner IDs to enroll",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cohortId": {
+            "type": "string",
+            "example": "uuid-of-cohort",
+            "description": "ID of the cohort to enroll into"
+          }
+        },
+        "required": [
+          "learnerIds",
+          "cohortId"
+        ]
+      },
+      "CreateCourseContentDto": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string",
+            "example": "Module 1: Getting Started",
+            "description": "Content topic"
+          },
+          "contentType": {
+            "type": "string",
+            "enum": [
+              "section",
+              "lesson",
+              "assessment"
+            ],
+            "description": "Type of content"
+          },
+          "sequenceOrder": {
+            "type": "number",
+            "example": 1,
+            "description": "Order of priority"
+          },
+          "parentId": {
+            "type": "string",
+            "example": "uuid-of-parent",
+            "description": "Parent content ID for nested sections"
+          }
+        },
+        "required": [
+          "topic",
+          "contentType"
+        ]
+      },
+      "UpdateCourseContentDto": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string",
+            "example": "Module 1: Updated Topic",
+            "description": "Content topic"
+          },
+          "contentType": {
+            "type": "string",
+            "enum": [
+              "section",
+              "lesson",
+              "assessment"
+            ],
+            "description": "Type of content"
+          },
+          "sequenceOrder": {
+            "type": "number",
+            "example": 2,
+            "description": "Order of priority"
+          },
+          "parentId": {
+            "type": "string",
+            "example": "uuid-of-parent",
+            "description": "Parent content ID"
+          }
+        }
+      },
+      "CreateAssessmentDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "quiz",
+              "assignment",
+              "group_assignment",
+              "code_challenge",
+              "kahoot_quiz"
+            ],
+            "description": "Type of assessment"
+          },
+          "title": {
+            "type": "string",
+            "example": "Final Quiz",
+            "description": "Title of the assessment"
+          },
+          "instructions": {
+            "type": "string",
+            "example": "Please answer all questions carefully.",
+            "description": "Instructions for the assessment"
+          }
+        },
+        "required": [
+          "type",
+          "title"
+        ]
+      },
+      "UpdateAssessmentDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "quiz",
+              "assignment",
+              "group_assignment",
+              "code_challenge",
+              "kahoot_quiz"
+            ],
+            "description": "Type of assessment"
+          },
+          "title": {
+            "type": "string",
+            "example": "Updated Quiz Title",
+            "description": "Title of the assessment"
+          },
+          "instructions": {
+            "type": "string",
+            "example": "Updated instructions.",
+            "description": "Instructions for the assessment"
+          }
+        }
+      },
+      "CreateQuizDto": {
+        "type": "object",
+        "properties": {
+          "timeAllocated": {
+            "type": "number",
+            "example": 30,
+            "description": "Time allocated in minutes"
+          },
+          "passMark": {
+            "type": "number",
+            "example": 70,
+            "description": "Pass mark percentage"
+          },
+          "isGroup": {
+            "type": "boolean",
+            "example": false,
+            "description": "Is it a group quiz?"
+          },
+          "groupPin": {
+            "type": "string",
+            "example": "123456",
+            "description": "PIN for group sessions"
+          }
+        },
+        "required": [
+          "timeAllocated",
+          "passMark"
+        ]
+      },
+      "CreateQuizQuestionDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "single_option",
+              "multiple_option",
+              "true_false",
+              "image_matching",
+              "fill_in_the_blank",
+              "short_answer"
+            ],
+            "description": "Type of question"
+          },
+          "question": {
+            "type": "string",
+            "example": "What is 2+2?",
+            "description": "The question text"
+          },
+          "options": {
+            "type": "object",
+            "example": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "description": "Options for multiple choice"
+          },
+          "correctAnswer": {
+            "type": "object",
+            "example": "4",
+            "description": "The correct answer"
+          },
+          "marks": {
+            "type": "number",
+            "example": 1,
+            "description": "Marks for this question"
+          },
+          "timeLimit": {
+            "type": "number",
+            "example": 30,
+            "description": "Time limit for this question in seconds"
+          }
+        },
+        "required": [
+          "type",
+          "question",
+          "correctAnswer"
+        ]
+      },
+      "CreateCodeChallengeDto": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": "string",
+            "example": "typescript",
+            "description": "Programming language"
+          },
+          "problemStatement": {
+            "type": "string",
+            "example": "Write a function that returns the sum of two numbers.",
+            "description": "Problem statement"
+          },
+          "boilerplateCode": {
+            "type": "string",
+            "example": "function sum(a, b) {\n  return a + b;\n}",
+            "description": "Boilerplate code"
+          },
+          "testCases": {
+            "example": [
+              {
+                "input": "1, 2",
+                "expectedOutput": "3",
+                "isHidden": false
+              }
+            ],
+            "description": "Test cases",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "language",
+          "problemStatement",
+          "testCases"
+        ]
+      },
+      "CreateQuizSessionDto": {
+        "type": "object",
+        "properties": {
+          "quizId": {
+            "type": "string",
+            "example": "uuid-of-quiz",
+            "description": "ID of the quiz"
+          },
+          "cohortId": {
+            "type": "string",
+            "example": "uuid-of-cohort",
+            "description": "ID of the cohort"
+          }
+        },
+        "required": [
+          "quizId",
+          "cohortId"
+        ]
+      },
+      "SubmitQuizAnswerDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "example": "uuid-of-question",
+            "description": "ID of the question"
+          },
+          "answer": {
+            "type": "object",
+            "example": "Option A",
+            "description": "The chosen answer"
+          },
+          "responseTimeMs": {
+            "type": "number",
+            "example": 1500,
+            "description": "Response time in milliseconds"
+          }
+        },
+        "required": [
+          "questionId",
+          "answer",
+          "responseTimeMs"
+        ]
+      },
+      "SubmitCodeChallengeDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "function sum(a, b) {\n  return a + b;\n}",
+            "description": "The submitted code"
+          }
+        },
+        "required": [
+          "code"
+        ]
+      }
+    }
+  }
+}
