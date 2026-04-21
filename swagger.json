@@ -16,6 +16,106 @@
         ]
       }
     },
+    "/stats/dashboard": {
+      "get": {
+        "operationId": "StatsController_getDashboardStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Dashboard stats retrieved."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get admin dashboard statistics",
+        "tags": [
+          "Stats"
+        ]
+      }
+    },
+    "/stats/tutors": {
+      "get": {
+        "operationId": "StatsController_getTutorStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Tutor stats retrieved."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get tutor statistics",
+        "tags": [
+          "Stats"
+        ]
+      }
+    },
+    "/stats/learners": {
+      "get": {
+        "operationId": "StatsController_getLearnerStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Learner stats retrieved."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get learner statistics",
+        "tags": [
+          "Stats"
+        ]
+      }
+    },
+    "/stats/my-students": {
+      "get": {
+        "operationId": "StatsController_getMyStudents",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Students retrieved."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get tutor's assigned students",
+        "tags": [
+          "Stats"
+        ]
+      }
+    },
+    "/stats/learner-dashboard": {
+      "get": {
+        "operationId": "StatsController_getLearnerDashboard",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Learner dashboard stats retrieved."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get learner dashboard statistics",
+        "tags": [
+          "Stats"
+        ]
+      }
+    },
     "/auth/super-admin/signup": {
       "post": {
         "operationId": "AuthController_signup",

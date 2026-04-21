@@ -54,9 +54,16 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    // Bypass TS property shadowing by getting the database value directly
+    const storedPassword = user.getDataValue('password') || user.get('password');
+
+    if (!loginDto.password || !storedPassword) {
+      throw new UnauthorizedException(`Password missing. Client password sent: ${!!loginDto.password}. DB password exists: ${!!storedPassword}`);
+    }
+
     const isPasswordValid = await bcrypt.compare(
       loginDto.password,
-      user.password,
+      storedPassword,
     );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
@@ -67,8 +74,13 @@ export class AuthService {
     }
 
     const token = this.generateToken(user);
-    const { password: _, ...userResponse } = user.toJSON();
-    return { user: userResponse as User, token };
+    const userJson = JSON.parse(JSON.stringify(user));
+    delete userJson.password;
+
+    return { 
+      user: userJson as User, 
+      token 
+    };
   }
 
   async signupLearner(

@@ -3,6 +3,8 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { CreateUserDto, LoginDto, UpdateUserDto } from '../dto/user.dto';
 import { ForgotPasswordDto, ResetPasswordDto } from '../dto/auth.dto';
+import { Request } from 'express';
+import { UserRole } from '../models/user.model';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -84,7 +86,9 @@ describe('AuthController', () => {
   describe('updateProfile', () => {
     it('should call authService.updateProfile', async () => {
       const dto: UpdateUserDto = { firstName: 'Updated' };
-      const req = { user: { userId: 'uuid-123' } } as any;
+      const req = {
+        user: { userId: 'uuid-123', role: UserRole.LEARNER },
+      } as unknown as Request & { user: { userId: string; role: UserRole } };
       await controller.updateProfile(req, dto);
       expect(mockAuthService.updateProfile).toHaveBeenCalledWith(
         'uuid-123',

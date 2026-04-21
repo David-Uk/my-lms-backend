@@ -5,6 +5,7 @@ import { CourseModule } from './course/course.module';
 import { AiModule } from './ai/ai.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { StatsController } from './stats.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
 import {
   User,
@@ -33,6 +34,13 @@ import {
     AuthModule,
     CourseModule,
     AiModule,
+    SequelizeModule.forFeature([
+      User,
+      Course,
+      Enrollment,
+      CourseTutor,
+      Cohort,
+    ]),
     SequelizeModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -66,7 +74,7 @@ import {
       inject: [ConfigService],
     }),
   ],
-  controllers: [AppController],
+  controllers: [AppController, StatsController],
   providers: [AppService],
 })
 export class AppModule { }
