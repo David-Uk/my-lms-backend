@@ -34,13 +34,7 @@ import {
     AuthModule,
     CourseModule,
     AiModule,
-    SequelizeModule.forFeature([
-      User,
-      Course,
-      Enrollment,
-      CourseTutor,
-      Cohort,
-    ]),
+    SequelizeModule.forFeature([User, Course, Enrollment, CourseTutor, Cohort]),
     SequelizeModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({

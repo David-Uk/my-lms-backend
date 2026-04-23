@@ -23,7 +23,7 @@ export class AuthService {
     @InjectModel(User)
     private userModel: typeof User,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async createSuperAdmin(
     createUserDto: CreateUserDto,
@@ -73,13 +73,21 @@ export class AuthService {
       throw new ForbiddenException('Your account has been suspended');
     }
 
+    // Debug: Log user role before token generation
+    console.log('[AuthService.login] User found:', { id: user.id, email: user.email, role: user.role });
+
     const token = this.generateToken(user);
+
+    // Debug: Log token payload
+    const tokenPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+    console.log('[AuthService.login] Token payload:', tokenPayload);
+
     const userJson = JSON.parse(JSON.stringify(user));
     delete userJson.password;
 
-    return { 
-      user: userJson as User, 
-      token 
+    return {
+      user: userJson as User,
+      token
     };
   }
 
