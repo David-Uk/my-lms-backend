@@ -74,7 +74,11 @@ export class AuthService {
     }
 
     // Debug: Log user role before token generation
-    console.log('[AuthService.login] User found:', { id: user.id, email: user.email, role: user.role });
+    console.log('[AuthService.login] User found:', { 
+      id: user.get('id'), 
+      email: user.get('email'), 
+      role: user.get('role') 
+    });
 
     const token = this.generateToken(user);
 
@@ -348,7 +352,11 @@ export class AuthService {
   }
 
   private generateToken(user: User): string {
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const payload = { 
+      sub: user.get('id'), 
+      email: user.get('email'), 
+      role: user.get('role') 
+    };
     return this.jwtService.sign(payload);
   }
 }

@@ -9,8 +9,8 @@ import {
   UseGuards,
   Request as NestRequest,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { AuthService } from './auth.service';
+import type { AuthenticatedRequest } from '../common/types';
 import { CreateUserDto, UpdateUserDto } from '../dto/user.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { RolesGuard } from './roles.guard';
@@ -30,7 +30,7 @@ import {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class UsersController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post()
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
@@ -45,7 +45,7 @@ export class UsersController {
   })
   async create(
     @Body() createUserDto: CreateUserDto,
-    @NestRequest() req: Request & { user: { role: UserRole } },
+    @NestRequest() req: AuthenticatedRequest,
   ) {
     return this.authService.createUser(createUserDto, req.user.role);
   }
@@ -62,7 +62,7 @@ export class UsersController {
     description: 'Forbidden. Requires Admin or SuperAdmin role.',
   })
   async findAll(
-    @NestRequest() req: Request & { user: { userId: string; role: UserRole } },
+    @NestRequest() req: AuthenticatedRequest,
   ) {
     return this.authService.findAllUsers(req.user.userId, req.user.role);
   }
@@ -85,7 +85,7 @@ export class UsersController {
   })
   async findOne(
     @Param('id') id: string,
-    @NestRequest() req: Request & { user: { userId: string; role: UserRole } },
+    @NestRequest() req: AuthenticatedRequest,
   ) {
     return this.authService.findOneUser(id, req.user.role, req.user.userId);
   }
@@ -109,7 +109,7 @@ export class UsersController {
   async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-    @NestRequest() req: Request & { user: { userId: string; role: UserRole } },
+    @NestRequest() req: AuthenticatedRequest,
   ) {
     return this.authService.updateOtherUser(
       id,
@@ -137,7 +137,7 @@ export class UsersController {
   })
   async remove(
     @Param('id') id: string,
-    @NestRequest() req: Request & { user: { userId: string; role: UserRole } },
+    @NestRequest() req: AuthenticatedRequest,
   ) {
     return this.authService.deleteUser(id, req.user.role, req.user.userId);
   }

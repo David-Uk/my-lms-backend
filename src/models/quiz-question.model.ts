@@ -35,14 +35,20 @@ export class QuizQuestion extends Model<QuizQuestion> {
   declare id: string;
 
   @ForeignKey(() => Quiz)
-  @AllowNull(false)
+  @AllowNull(true)
   @Column({
     type: DataType.UUID,
   })
-  quizId: string;
+  quizId: string | null;
 
   @BelongsTo(() => Quiz)
   quiz: Quiz;
+
+  @Column({
+    type: DataType.UUID,
+    comment: 'Reference to shared question if this is a copied question',
+  })
+  sourceQuestionId: string | null;
 
   @AllowNull(false)
   @Column({

@@ -4,7 +4,6 @@ import {
   UseGuards,
   Request as NestRequest,
 } from '@nestjs/common';
-import { Request } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -15,6 +14,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { RolesGuard } from './auth/roles.guard';
 import { Roles } from './auth/roles.decorator';
 import { UserRole } from './models';
+import type { AuthenticatedRequest } from './common/types';
 import { InjectModel } from '@nestjs/sequelize';
 import { User, Course, Enrollment, CourseTutor, Cohort } from './models';
 import { Op } from 'sequelize';
@@ -42,7 +42,7 @@ export class StatsController {
   @ApiOperation({ summary: 'Get admin dashboard statistics' })
   @ApiResponse({ status: 200, description: 'Dashboard stats retrieved.' })
   async getDashboardStats(
-    @NestRequest() req: Request & { user: { userId: string; role: UserRole } },
+    @NestRequest() req: AuthenticatedRequest,
   ) {
     const where: any = {};
 
@@ -137,7 +137,7 @@ export class StatsController {
   @ApiOperation({ summary: 'Get tutor statistics' })
   @ApiResponse({ status: 200, description: 'Tutor stats retrieved.' })
   async getTutorStats(
-    @NestRequest() req: Request & { user: { userId: string; role: UserRole } },
+    @NestRequest() req: AuthenticatedRequest,
   ) {
     const where: any = { role: UserRole.TUTOR };
 
@@ -168,7 +168,7 @@ export class StatsController {
   @ApiOperation({ summary: 'Get learner statistics' })
   @ApiResponse({ status: 200, description: 'Learner stats retrieved.' })
   async getLearnerStats(
-    @NestRequest() req: Request & { user: { userId: string; role: UserRole } },
+    @NestRequest() req: AuthenticatedRequest,
   ) {
     const where: any = { role: UserRole.LEARNER };
 

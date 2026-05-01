@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { CourseModule } from './course/course.module';
 import { AiModule } from './ai/ai.module';
+import { QuizModule } from './quiz/quiz.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { StatsController } from './stats.controller';
@@ -24,6 +25,9 @@ import {
   QuizSession,
   QuizParticipantAnswer,
   CodeChallengeSubmission,
+  QuizParticipant,
+  QuizAccessToken,
+  QuizResponse,
 } from './models';
 
 @Module({
@@ -34,6 +38,7 @@ import {
     AuthModule,
     CourseModule,
     AiModule,
+    QuizModule,
     SequelizeModule.forFeature([User, Course, Enrollment, CourseTutor, Cohort]),
     SequelizeModule.forRootAsync({
       imports: [ConfigModule],
@@ -63,6 +68,9 @@ import {
           QuizSession,
           QuizParticipantAnswer,
           CodeChallengeSubmission,
+          QuizParticipant,
+          QuizAccessToken,
+          QuizResponse,
         ],
       }),
       inject: [ConfigService],

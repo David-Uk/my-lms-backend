@@ -2281,6 +2281,432 @@
           }
         }
       ]
+    },
+    {
+      "name": "Standalone Quizzes",
+      "item": [
+        {
+          "name": "Create a standalone quiz",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/quizzes/standalone",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "quizzes",
+                "standalone"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"JavaScript Fundamentals\",\n  \"description\": \"Test your JavaScript knowledge\",\n  \"timeAllocated\": 30,\n  \"passMark\": 70\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get a standalone quiz",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/quizzes/standalone/{id}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "quizzes",
+                "standalone",
+                {
+                  "value": ":id",
+                  "key": "id"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Quiz ID"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Invite participants to a quiz",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/quizzes/standalone/{id}/participants",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "quizzes",
+                "standalone",
+                {
+                  "value": ":id",
+                  "key": "id"
+                },
+                "participants"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Quiz ID"
+                }
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"participants\": [\n    {\n      \"name\": \"John Doe\",\n      \"email\": \"john@example.com\"\n    },\n    {\n      \"name\": \"Jane Smith\",\n      \"email\": \"jane@example.com\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get quiz participants",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/quizzes/standalone/{id}/participants",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "quizzes",
+                "standalone",
+                {
+                  "value": ":id",
+                  "key": "id"
+                },
+                "participants"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Quiz ID"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Add a question to a standalone quiz",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/quizzes/standalone/{id}/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "quizzes",
+                "standalone",
+                {
+                  "value": ":id",
+                  "key": "id"
+                },
+                "questions"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Quiz ID"
+                }
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"single_option\",\n  \"question\": \"What is 2+2?\",\n  \"options\": [\n    \"1\",\n    \"2\",\n    \"3\",\n    \"4\"\n  ],\n  \"correctAnswer\": \"4\",\n  \"marks\": 1,\n  \"timeLimit\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get all questions for a quiz",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/quizzes/standalone/{id}/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "quizzes",
+                "standalone",
+                {
+                  "value": ":id",
+                  "key": "id"
+                },
+                "questions"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Quiz ID"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Copy a question from another quiz",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/quizzes/standalone/{id}/questions/copy",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "quizzes",
+                "standalone",
+                {
+                  "value": ":id",
+                  "key": "id"
+                },
+                "questions",
+                "copy"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Target Quiz ID"
+                }
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceQuestionId\": \"uuid-of-source-question\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get all questions from standalone quizzes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/quizzes/questions/all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "quizzes",
+                "questions",
+                "all"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Start taking a quiz (public endpoint)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/quizzes/start",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "quizzes",
+                "start"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quizId\": \"uuid-of-quiz\",\n  \"token\": \"uuid-of-token\",\n  \"deviceFingerprint\": \"abc123def456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get quiz for taking (public endpoint)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/quizzes/take/{quizId}/{token}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "quizzes",
+                "take",
+                {
+                  "value": ":quizId",
+                  "key": "quizId"
+                },
+                {
+                  "value": ":token",
+                  "key": "token"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "quizId",
+                  "value": "",
+                  "description": "Quiz ID"
+                },
+                {
+                  "key": "token",
+                  "value": "",
+                  "description": "Access token"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Submit an answer to a quiz",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/quizzes/take/{quizId}/{participantId}/answer",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "quizzes",
+                "take",
+                {
+                  "value": ":quizId",
+                  "key": "quizId"
+                },
+                {
+                  "value": ":participantId",
+                  "key": "participantId"
+                },
+                "answer"
+              ],
+              "variable": [
+                {
+                  "key": "quizId",
+                  "value": "",
+                  "description": "Quiz ID"
+                },
+                {
+                  "key": "participantId",
+                  "value": "",
+                  "description": "Participant ID"
+                }
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionId\": \"uuid-of-question\",\n  \"answer\": \"Option A\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
     }
   ]
 }

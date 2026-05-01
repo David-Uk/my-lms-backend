@@ -8,6 +8,7 @@ import {
   IsBoolean,
   IsArray,
   Min,
+  IsEmail,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AssessmentType, QuestionType } from '../models';
@@ -193,4 +194,94 @@ export class SubmitCodeChallengeDto {
   @IsNotEmpty()
   @IsString()
   code: string;
+}
+
+export class CreateStandaloneQuizDto {
+  @ApiProperty({ example: 'JavaScript Fundamentals', description: 'Quiz title' })
+  @IsNotEmpty()
+  @IsString()
+  title: string;
+
+  @ApiPropertyOptional({
+    example: 'Test your JavaScript knowledge',
+    description: 'Quiz description',
+  })
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @ApiProperty({ example: 30, description: 'Time allocated in minutes' })
+  @IsInt()
+  @Min(1)
+  timeAllocated: number;
+
+  @ApiProperty({ example: 70, description: 'Pass mark percentage' })
+  @IsInt()
+  @Min(0)
+  passMark: number;
+}
+
+export class InviteParticipantDto {
+  @ApiProperty({ example: 'John Doe', description: 'Participant name' })
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
+  @ApiProperty({ example: 'john@example.com', description: 'Participant email' })
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+}
+
+export class InviteParticipantsBulkDto {
+  @ApiProperty({
+    example: [
+      { name: 'John Doe', email: 'john@example.com' },
+      { name: 'Jane Smith', email: 'jane@example.com' },
+    ],
+    description: 'Array of participants to invite',
+  })
+  @IsArray()
+  @IsNotEmpty()
+  participants: InviteParticipantDto[];
+}
+
+export class StartQuizDto {
+  @ApiProperty({ example: 'uuid-of-quiz', description: 'Quiz ID from email link' })
+  @IsUUID()
+  quizId: string;
+
+  @ApiProperty({ example: 'uuid-of-token', description: 'Access token from email' })
+  @IsUUID()
+  token: string;
+
+  @ApiPropertyOptional({
+    example: 'abc123def456',
+    description: 'Device fingerprint for session locking',
+  })
+  @IsOptional()
+  @IsString()
+  deviceFingerprint?: string;
+}
+
+export class SubmitAnswerDto {
+  @ApiProperty({
+    example: 'uuid-of-question',
+    description: 'Question ID',
+  })
+  @IsUUID()
+  questionId: string;
+
+  @ApiProperty({ example: 'Option A', description: 'The answer' })
+  @IsNotEmpty()
+  answer: any;
+}
+
+export class CopyQuestionDto {
+  @ApiProperty({
+    example: 'uuid-of-source-question',
+    description: 'ID of the question to copy',
+  })
+  @IsUUID()
+  sourceQuestionId: string;
 }

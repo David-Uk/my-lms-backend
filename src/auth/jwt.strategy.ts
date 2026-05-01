@@ -17,10 +17,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     configService: ConfigService,
     @InjectModel(User) private userModel: typeof User,
   ) {
+    const secret = configService.get<string>('JWT_SECRET');
+    if (!secret) {
+      console.warn('[JWT Strategy] JWT_SECRET is not defined in environment! Using fallback.');
+    }
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET') || 'defaultSecret', // Fallback for dev
+      secretOrKey: secret || 'supersecretkey123',
     });
   }
 
@@ -35,10 +39,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user = await this.userModel.findByPk(payload.sub);
     if (!user) {
       console.log('[JWT Strategy] User not found in DB:', payload.sub);
-      return { userId: payload.sub, email: payload.email, role: null };
+      return null; // This will trigger a 401
     }
 
-    console.log('[JWT Strategy] User found in DB with role:', user.role);
-    return { userId: payload.sub, email: payload.email, role: user.role };
+    console.log('[JWT Strategy] User validated:', { 
+      id: user.get('id'), 
+      email: user.get('email'), 
+      role: user.get('role') 
+    });
+    return { 
+      userId: payload.sub, 
+      email: user.get('email'), 
+      role: user.get('role') 
+    };
   }
 }

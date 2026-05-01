@@ -10,7 +10,6 @@ import {
   UseGuards,
   Request as NestRequest,
 } from '@nestjs/common';
-import { Request } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -19,6 +18,7 @@ import {
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
+import type { AuthenticatedRequest } from '../common/types';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -41,7 +41,7 @@ import {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class CourseController {
-  constructor(private readonly courseService: CourseService) {}
+  constructor(private readonly courseService: CourseService) { }
 
   // ═══════════════════════════════════════════════════════════════
   //  COURSE CRUD
@@ -54,7 +54,7 @@ export class CourseController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   async create(
     @Body() createCourseDto: CreateCourseDto,
-    @NestRequest() req: Request & { user: { userId: string } },
+    @NestRequest() req: AuthenticatedRequest,
   ) {
     return this.courseService.createCourse(createCourseDto, req.user.userId);
   }
@@ -87,7 +87,7 @@ export class CourseController {
   async update(
     @Param('id') id: string,
     @Body() updateCourseDto: UpdateCourseDto,
-    @NestRequest() req: Request & { user: { userId: string; role: UserRole } },
+    @NestRequest() req: AuthenticatedRequest,
   ) {
     return this.courseService.updateCourse(
       id,
@@ -106,7 +106,7 @@ export class CourseController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   async remove(
     @Param('id') id: string,
-    @NestRequest() req: Request & { user: { userId: string; role: UserRole } },
+    @NestRequest() req: AuthenticatedRequest,
   ) {
     await this.courseService.deleteCourse(id, req.user.userId, req.user.role);
     return { message: 'Course deleted successfully' };
@@ -255,7 +255,7 @@ export class CourseController {
   async createContent(
     @Param('id') id: string,
     @Body() dto: CreateCourseContentDto,
-    @NestRequest() req: Request & { user: { userId: string; role: UserRole } },
+    @NestRequest() req: AuthenticatedRequest,
   ) {
     return this.courseService.createCourseContent(
       id,
@@ -275,7 +275,7 @@ export class CourseController {
   async updateContent(
     @Param('contentId') contentId: string,
     @Body() dto: UpdateCourseContentDto,
-    @NestRequest() req: Request & { user: { userId: string; role: UserRole } },
+    @NestRequest() req: AuthenticatedRequest,
   ) {
     return this.courseService.updateCourseContent(
       contentId,
@@ -294,7 +294,7 @@ export class CourseController {
   @ApiResponse({ status: 200, description: 'Content deleted.' })
   async removeContent(
     @Param('contentId') contentId: string,
-    @NestRequest() req: Request & { user: { userId: string; role: UserRole } },
+    @NestRequest() req: AuthenticatedRequest,
   ) {
     await this.courseService.deleteCourseContent(
       contentId,

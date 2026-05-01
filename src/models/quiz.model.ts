@@ -13,6 +13,7 @@ import {
 } from 'sequelize-typescript';
 import { Assessment } from './assessment.model';
 import { QuizQuestion } from './quiz-question.model';
+import { QuizParticipant } from './quiz-participant.model';
 
 @Table({
   tableName: 'quizzes',
@@ -27,12 +28,24 @@ export class Quiz extends Model<Quiz> {
   })
   declare id: string;
 
+  @Column({
+    type: DataType.STRING(255),
+    comment: 'Title for standalone quizzes',
+  })
+  declare title: string;
+
+  @Column({
+    type: DataType.TEXT,
+    comment: 'Description for standalone quizzes',
+  })
+  declare description: string | null;
+
   @ForeignKey(() => Assessment)
-  @AllowNull(false)
+  @AllowNull(true)
   @Column({
     type: DataType.UUID,
   })
-  assessmentId: string;
+  assessmentId: string | null;
 
   @BelongsTo(() => Assessment)
   assessment: Assessment;
@@ -65,6 +78,9 @@ export class Quiz extends Model<Quiz> {
 
   @HasMany(() => QuizQuestion)
   questions: QuizQuestion[];
+
+  @HasMany(() => QuizParticipant)
+  participants: QuizParticipant[];
 
   @CreatedAt
   declare createdAt: Date;

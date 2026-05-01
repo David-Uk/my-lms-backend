@@ -6,8 +6,8 @@ import {
   Put,
   Request as NestRequest,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { AuthService } from './auth.service';
+import type { AuthenticatedRequest } from '../common/types';
 import { CreateUserDto, LoginDto, UpdateUserDto } from '../dto/user.dto';
 import { ForgotPasswordDto, ResetPasswordDto } from '../dto/auth.dto';
 import { UserRole } from '../models/user.model';
@@ -18,7 +18,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('super-admin/signup')
   @ApiOperation({ summary: 'Create a super admin account' })
@@ -66,7 +66,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Profile updated successfully.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async updateProfile(
-    @NestRequest() req: Request & { user: { userId: string; role: UserRole } },
+    @NestRequest() req: AuthenticatedRequest,
     @Body() updateUserDto: UpdateUserDto,
   ) {
     if (req.user.role !== UserRole.SUPERADMIN) {

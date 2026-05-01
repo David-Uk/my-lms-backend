@@ -1771,6 +1771,412 @@
           "AI"
         ]
       }
+    },
+    "/quizzes/standalone": {
+      "post": {
+        "operationId": "StandaloneQuizController_createStandaloneQuiz",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStandaloneQuizDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Quiz created successfully"
+          }
+        },
+        "summary": "Create a standalone quiz",
+        "tags": [
+          "Standalone Quizzes"
+        ]
+      }
+    },
+    "/quizzes/standalone/{id}": {
+      "get": {
+        "operationId": "StandaloneQuizController_getStandaloneQuiz",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Quiz ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get a standalone quiz",
+        "tags": [
+          "Standalone Quizzes"
+        ]
+      }
+    },
+    "/quizzes/standalone/{id}/participants": {
+      "post": {
+        "operationId": "StandaloneQuizController_inviteParticipants",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Quiz ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteParticipantsBulkDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Invite participants to a quiz",
+        "tags": [
+          "Standalone Quizzes"
+        ]
+      },
+      "get": {
+        "operationId": "StandaloneQuizController_getParticipants",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Quiz ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get quiz participants",
+        "tags": [
+          "Standalone Quizzes"
+        ]
+      }
+    },
+    "/quizzes/standalone/{id}/questions": {
+      "post": {
+        "operationId": "StandaloneQuizController_addQuestion",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Quiz ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuizQuestionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Add a question to a standalone quiz",
+        "tags": [
+          "Standalone Quizzes"
+        ]
+      },
+      "get": {
+        "operationId": "StandaloneQuizController_getQuestions",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Quiz ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get all questions for a quiz",
+        "tags": [
+          "Standalone Quizzes"
+        ]
+      }
+    },
+    "/quizzes/standalone/{id}/questions/copy": {
+      "post": {
+        "operationId": "StandaloneQuizController_copyQuestion",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Target Quiz ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyQuestionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Copy a question from another quiz",
+        "tags": [
+          "Standalone Quizzes"
+        ]
+      }
+    },
+    "/quizzes/questions/all": {
+      "get": {
+        "operationId": "StandaloneQuizController_getAllStandaloneQuestions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get all questions from standalone quizzes",
+        "tags": [
+          "Standalone Quizzes"
+        ]
+      }
+    },
+    "/quizzes/start": {
+      "post": {
+        "operationId": "StandaloneQuizController_startQuiz",
+        "parameters": [
+          {
+            "name": "x-device-fingerprint",
+            "required": false,
+            "in": "header",
+            "description": "Device fingerprint to lock session",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user-agent",
+            "required": false,
+            "in": "header",
+            "description": "Browser user agent",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartQuizDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Quiz started successfully"
+          }
+        },
+        "summary": "Start taking a quiz (public endpoint)",
+        "tags": [
+          "Standalone Quizzes"
+        ]
+      }
+    },
+    "/quizzes/take/{quizId}/{token}": {
+      "get": {
+        "operationId": "StandaloneQuizController_getQuizForTaking",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "in": "path",
+            "description": "Quiz ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "token",
+            "required": true,
+            "in": "path",
+            "description": "Access token",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-device-fingerprint",
+            "required": false,
+            "in": "header",
+            "description": "Device fingerprint to verify session",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get quiz for taking (public endpoint)",
+        "tags": [
+          "Standalone Quizzes"
+        ]
+      }
+    },
+    "/quizzes/take/{quizId}/{participantId}/answer": {
+      "post": {
+        "operationId": "StandaloneQuizController_submitAnswer",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "in": "path",
+            "description": "Quiz ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "participantId",
+            "required": true,
+            "in": "path",
+            "description": "Participant ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitAnswerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Submit an answer to a quiz",
+        "tags": [
+          "Standalone Quizzes"
+        ]
+      }
+    },
+    "/quizzes/take/{quizId}/{participantId}/complete": {
+      "post": {
+        "operationId": "StandaloneQuizController_completeQuiz",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "in": "path",
+            "description": "Quiz ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "participantId",
+            "required": true,
+            "in": "path",
+            "description": "Participant ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Complete a quiz and get results",
+        "tags": [
+          "Standalone Quizzes"
+        ]
+      }
+    },
+    "/quizzes/results/{participantId}": {
+      "get": {
+        "operationId": "StandaloneQuizController_getResults",
+        "parameters": [
+          {
+            "name": "participantId",
+            "required": true,
+            "in": "path",
+            "description": "Participant ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get participant quiz results",
+        "tags": [
+          "Standalone Quizzes"
+        ]
+      }
     }
   },
   "info": {
@@ -2424,6 +2830,117 @@
         },
         "required": [
           "code"
+        ]
+      },
+      "CreateStandaloneQuizDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "JavaScript Fundamentals",
+            "description": "Quiz title"
+          },
+          "description": {
+            "type": "string",
+            "example": "Test your JavaScript knowledge",
+            "description": "Quiz description"
+          },
+          "timeAllocated": {
+            "type": "number",
+            "example": 30,
+            "description": "Time allocated in minutes"
+          },
+          "passMark": {
+            "type": "number",
+            "example": 70,
+            "description": "Pass mark percentage"
+          }
+        },
+        "required": [
+          "title",
+          "timeAllocated",
+          "passMark"
+        ]
+      },
+      "InviteParticipantsBulkDto": {
+        "type": "object",
+        "properties": {
+          "participants": {
+            "example": [
+              {
+                "name": "John Doe",
+                "email": "john@example.com"
+              },
+              {
+                "name": "Jane Smith",
+                "email": "jane@example.com"
+              }
+            ],
+            "description": "Array of participants to invite",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "participants"
+        ]
+      },
+      "CopyQuestionDto": {
+        "type": "object",
+        "properties": {
+          "sourceQuestionId": {
+            "type": "string",
+            "example": "uuid-of-source-question",
+            "description": "ID of the question to copy"
+          }
+        },
+        "required": [
+          "sourceQuestionId"
+        ]
+      },
+      "StartQuizDto": {
+        "type": "object",
+        "properties": {
+          "quizId": {
+            "type": "string",
+            "example": "uuid-of-quiz",
+            "description": "Quiz ID from email link"
+          },
+          "token": {
+            "type": "string",
+            "example": "uuid-of-token",
+            "description": "Access token from email"
+          },
+          "deviceFingerprint": {
+            "type": "string",
+            "example": "abc123def456",
+            "description": "Device fingerprint for session locking"
+          }
+        },
+        "required": [
+          "quizId",
+          "token"
+        ]
+      },
+      "SubmitAnswerDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "example": "uuid-of-question",
+            "description": "Question ID"
+          },
+          "answer": {
+            "type": "object",
+            "example": "Option A",
+            "description": "The answer"
+          }
+        },
+        "required": [
+          "questionId",
+          "answer"
         ]
       }
     }

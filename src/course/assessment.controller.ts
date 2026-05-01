@@ -9,7 +9,6 @@ import {
   UseGuards,
   Request as NestRequest,
 } from '@nestjs/common';
-import { Request } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -18,6 +17,7 @@ import {
   ApiParam,
   ApiBody,
 } from '@nestjs/swagger';
+import type { AuthenticatedRequest } from '../common/types';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -113,7 +113,7 @@ export class AssessmentController {
   @ApiResponse({ status: 404, description: 'Quiz or cohort not found.' })
   async createSession(
     @Body() dto: CreateQuizSessionDto,
-    @NestRequest() req: Request & { user: { userId: string } },
+    @NestRequest() req: AuthenticatedRequest,
   ) {
     return this.assessmentService.createQuizSession(req.user.userId, dto);
   }
@@ -153,7 +153,7 @@ export class AssessmentController {
   async submitAnswer(
     @Param('sessionId') sessionId: string,
     @Body() dto: SubmitQuizAnswerDto,
-    @NestRequest() req: Request & { user: { userId: string } },
+    @NestRequest() req: AuthenticatedRequest,
   ) {
     return this.assessmentService.submitQuizAnswer(
       sessionId,
@@ -185,7 +185,7 @@ export class AssessmentController {
   async submitCode(
     @Param('challengeId') challengeId: string,
     @Body() dto: SubmitCodeChallengeDto,
-    @NestRequest() req: Request & { user: { userId: string } },
+    @NestRequest() req: AuthenticatedRequest,
   ) {
     return this.assessmentService.submitCodeChallenge(
       challengeId,

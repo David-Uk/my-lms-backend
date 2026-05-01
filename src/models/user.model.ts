@@ -59,13 +59,13 @@ export class User extends Model<User, UserCreationAttributes> {
   @Column({
     type: DataType.STRING(100),
   })
-  firstName: string;
+  declare firstName: string;
 
   @AllowNull(false)
   @Column({
     type: DataType.STRING(100),
   })
-  lastName: string;
+  declare lastName: string;
 
   @Unique
   @IsEmail
@@ -73,67 +73,67 @@ export class User extends Model<User, UserCreationAttributes> {
   @Column({
     type: DataType.STRING(255),
   })
-  email: string;
+  declare email: string;
 
   @AllowNull(false)
   @Column({
     type: DataType.STRING(255),
   })
-  password: string;
+  declare password: string;
 
   @AllowNull(false)
   @Default(UserRole.LEARNER)
   @Column({
     type: DataType.ENUM(...Object.values(UserRole)),
   })
-  role: UserRole;
+  declare role: UserRole;
 
   @Default(UserStatus.ACTIVE)
   @Column({
     type: DataType.ENUM(...Object.values(UserStatus)),
   })
-  status: UserStatus;
+  declare status: UserStatus;
 
   @Column({
     type: DataType.STRING(20),
   })
-  phoneNumber: string | null;
+  declare phoneNumber: string | null;
 
   @Column({
     type: DataType.TEXT,
   })
-  profilePicture: string | null;
+  declare profilePicture: string | null;
 
   @Column({
     type: DataType.TEXT,
   })
-  bio: string | null;
+  declare bio: string | null;
 
   @Column({
     type: DataType.DATE,
   })
-  lastLoginAt: Date | null;
+  declare lastLoginAt: Date | null;
 
   @Column({
     type: DataType.STRING(255),
   })
-  resetPasswordToken: string | null;
+  declare resetPasswordToken: string | null;
 
   @Column({
     type: DataType.DATE,
   })
-  resetPasswordExpires: Date | null;
+  declare resetPasswordExpires: Date | null;
 
   @Column({
     type: DataType.BOOLEAN,
     defaultValue: false,
   })
-  emailVerified: boolean;
+  declare emailVerified: boolean;
 
   @Column({
     type: DataType.STRING(255),
   })
-  emailVerificationToken: string | null;
+  declare emailVerificationToken: string | null;
 
   @CreatedAt
   declare createdAt: Date;
