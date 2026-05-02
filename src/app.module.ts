@@ -4,6 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { CourseModule } from './course/course.module';
 import { AiModule } from './ai/ai.module';
 import { QuizModule } from './quiz/quiz.module';
+import { LiveSessionModule } from './live-session/live-session.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { StatsController } from './stats.controller';
@@ -28,6 +29,7 @@ import {
   QuizParticipant,
   QuizAccessToken,
   QuizResponse,
+  LiveSession,
 } from './models';
 
 @Module({
@@ -39,6 +41,7 @@ import {
     CourseModule,
     AiModule,
     QuizModule,
+    LiveSessionModule,
     SequelizeModule.forFeature([User, Course, Enrollment, CourseTutor, Cohort]),
     SequelizeModule.forRootAsync({
       imports: [ConfigModule],
@@ -71,6 +74,7 @@ import {
           QuizParticipant,
           QuizAccessToken,
           QuizResponse,
+          LiveSession,
         ],
       }),
       inject: [ConfigService],
