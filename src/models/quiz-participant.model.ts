@@ -97,6 +97,20 @@ export class QuizParticipant extends Model<QuizParticipant> {
   })
   declare passed: boolean;
 
+  @Column({
+    type: DataType.INTEGER,
+    defaultValue: 0,
+    comment: 'Number of times the participant switched tabs during the quiz',
+  })
+  declare tabSwitchCount: number;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+    comment: 'Whether the quiz was auto-terminated due to a tab switch',
+  })
+  declare terminatedByTabSwitch: boolean;
+
   @CreatedAt
   declare createdAt: Date;
 

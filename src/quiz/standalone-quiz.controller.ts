@@ -34,7 +34,7 @@ import {
 @ApiTags('Standalone Quizzes')
 @Controller('quizzes')
 export class StandaloneQuizController {
-  constructor(private readonly standaloneQuizService: StandaloneQuizService) {}
+  constructor(private readonly standaloneQuizService: StandaloneQuizService) { }
 
   @Post('standalone')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -179,6 +179,25 @@ export class StandaloneQuizController {
     @Param('participantId') participantId: string,
   ) {
     return this.standaloneQuizService.completeQuiz(participantId, quizId);
+  }
+
+  @Post('take/:quizId/:participantId/tab-switch')
+  @ApiOperation({
+    summary:
+      'Report a tab switch — auto-terminates the quiz and scores only answered questions',
+  })
+  @ApiParam({ name: 'quizId', description: 'Quiz ID' })
+  @ApiParam({ name: 'participantId', description: 'Participant ID' })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Tab switch recorded. Quiz is terminated and partial score is calculated.',
+  })
+  async reportTabSwitch(
+    @Param('quizId') quizId: string,
+    @Param('participantId') participantId: string,
+  ) {
+    return this.standaloneQuizService.reportTabSwitch(quizId, participantId);
   }
 
   @Get('results/:participantId')

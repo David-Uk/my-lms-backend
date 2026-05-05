@@ -2153,6 +2153,40 @@
         ]
       }
     },
+    "/quizzes/take/{quizId}/{participantId}/tab-switch": {
+      "post": {
+        "operationId": "StandaloneQuizController_reportTabSwitch",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "in": "path",
+            "description": "Quiz ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "participantId",
+            "required": true,
+            "in": "path",
+            "description": "Participant ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tab switch recorded. Quiz is terminated and partial score is calculated."
+          }
+        },
+        "summary": "Report a tab switch — auto-terminates the quiz and scores only answered questions",
+        "tags": [
+          "Standalone Quizzes"
+        ]
+      }
+    },
     "/quizzes/results/{participantId}": {
       "get": {
         "operationId": "StandaloneQuizController_getResults",
@@ -2175,6 +2209,153 @@
         "summary": "Get participant quiz results",
         "tags": [
           "Standalone Quizzes"
+        ]
+      }
+    },
+    "/live-sessions": {
+      "post": {
+        "operationId": "LiveSessionController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLiveSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new live session",
+        "tags": [
+          "Live Sessions"
+        ]
+      }
+    },
+    "/live-sessions/course/{courseId}": {
+      "get": {
+        "operationId": "LiveSessionController_findAllByCourse",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all live sessions for a course",
+        "tags": [
+          "Live Sessions"
+        ]
+      }
+    },
+    "/live-sessions/join/{sessionId}": {
+      "get": {
+        "operationId": "LiveSessionController_join",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get join details for a live session",
+        "tags": [
+          "Live Sessions"
+        ]
+      }
+    },
+    "/live-sessions/{id}": {
+      "patch": {
+        "operationId": "LiveSessionController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLiveSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update live session",
+        "tags": [
+          "Live Sessions"
+        ]
+      }
+    },
+    "/live-sessions/webhook": {
+      "post": {
+        "operationId": "LiveSessionController_webhook",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "VideoSDK Webhook",
+        "tags": [
+          "Live Sessions"
         ]
       }
     }
@@ -2942,6 +3123,66 @@
           "questionId",
           "answer"
         ]
+      },
+      "CreateLiveSessionDto": {
+        "type": "object",
+        "properties": {
+          "courseId": {
+            "type": "string"
+          },
+          "cohortId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "startTime": {
+            "type": "string"
+          },
+          "endTime": {
+            "type": "string"
+          },
+          "storageConfig": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "courseId",
+          "title",
+          "startTime"
+        ]
+      },
+      "UpdateLiveSessionDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "scheduled",
+              "live",
+              "completed",
+              "cancelled"
+            ]
+          },
+          "startTime": {
+            "type": "string"
+          },
+          "endTime": {
+            "type": "string"
+          },
+          "recordingUrl": {
+            "type": "string"
+          }
+        }
       }
     }
   }

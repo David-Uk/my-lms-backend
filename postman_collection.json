@@ -2705,6 +2705,347 @@
               }
             }
           }
+        },
+        {
+          "name": "Complete a quiz and get results",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/quizzes/take/{quizId}/{participantId}/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "quizzes",
+                "take",
+                {
+                  "value": ":quizId",
+                  "key": "quizId"
+                },
+                {
+                  "value": ":participantId",
+                  "key": "participantId"
+                },
+                "complete"
+              ],
+              "variable": [
+                {
+                  "key": "quizId",
+                  "value": "",
+                  "description": "Quiz ID"
+                },
+                {
+                  "key": "participantId",
+                  "value": "",
+                  "description": "Participant ID"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Report a tab switch — auto-terminates the quiz and scores only answered questions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/quizzes/take/{quizId}/{participantId}/tab-switch",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "quizzes",
+                "take",
+                {
+                  "value": ":quizId",
+                  "key": "quizId"
+                },
+                {
+                  "value": ":participantId",
+                  "key": "participantId"
+                },
+                "tab-switch"
+              ],
+              "variable": [
+                {
+                  "key": "quizId",
+                  "value": "",
+                  "description": "Quiz ID"
+                },
+                {
+                  "key": "participantId",
+                  "value": "",
+                  "description": "Participant ID"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Get participant quiz results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/quizzes/results/{participantId}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "quizzes",
+                "results",
+                {
+                  "value": ":participantId",
+                  "key": "participantId"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "participantId",
+                  "value": "",
+                  "description": "Participant ID"
+                }
+              ]
+            },
+            "description": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "Live Sessions",
+      "item": [
+        {
+          "name": "Create a new live session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/live-sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "live-sessions"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseId\": \"\",\n  \"cohortId\": \"\",\n  \"title\": \"\",\n  \"description\": \"\",\n  \"startTime\": \"\",\n  \"endTime\": \"\",\n  \"storageConfig\": {}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get all live sessions for a course",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/live-sessions/course/{courseId}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "live-sessions",
+                "course",
+                {
+                  "value": ":courseId",
+                  "key": "courseId"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "courseId",
+                  "value": "",
+                  "description": ""
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get join details for a live session",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/live-sessions/join/{sessionId}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "live-sessions",
+                "join",
+                {
+                  "value": ":sessionId",
+                  "key": "sessionId"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "sessionId",
+                  "value": "",
+                  "description": ""
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update live session",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/live-sessions/{id}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "live-sessions",
+                {
+                  "value": ":id",
+                  "key": "id"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": ""
+                }
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"\",\n  \"description\": \"\",\n  \"status\": \"scheduled\",\n  \"startTime\": \"\",\n  \"endTime\": \"\",\n  \"recordingUrl\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "VideoSDK Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/live-sessions/webhook",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "live-sessions",
+                "webhook"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
         }
       ]
     }

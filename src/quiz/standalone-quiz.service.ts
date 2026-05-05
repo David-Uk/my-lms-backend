@@ -34,7 +34,7 @@ export class StandaloneQuizService {
     private quizAccessTokenModel: typeof QuizAccessToken,
     @InjectModel(QuizResponse)
     private quizResponseModel: typeof QuizResponse,
-  ) {}
+  ) { }
 
   async createStandaloneQuiz(dto: CreateStandaloneQuizDto): Promise<Quiz> {
     return this.quizModel.create({
@@ -175,14 +175,14 @@ export class StandaloneQuizService {
 
     participant.status = QuizParticipantStatus.STARTED;
     participant.startedAt = new Date();
-    
+
     if (dto.deviceFingerprint) {
       participant.deviceFingerprint = dto.deviceFingerprint;
     }
     if (dto.deviceInfo) {
       participant.deviceInfo = dto.deviceInfo;
     }
-    
+
     await participant.save();
 
     return { quiz, participant };
@@ -327,6 +327,60 @@ export class StandaloneQuizService {
     await participant.save();
 
     return participant;
+  }
+
+  async reportTabSwitch(
+    quizId: string,
+    participantId: string,
+  ): Promise<{ participant: QuizParticipant; terminated: boolean }> {
+    const participant = await this.quizParticipantModel.findByPk(participantId);
+
+    if (!participant || participant.quizId !== quizId) {
+      throw new NotFoundException('Participant not found');
+    }
+
+    if (participant.status !== QuizParticipantStatus.STARTED) {
+      // Quiz already completed or not started — nothing to do
+      return { participant, terminated: false };
+    }
+
+    participant.tabSwitchCount = (participant.tabSwitchCount ?? 0) + 1;
+
+    // Auto-terminate on the first tab switch
+    const responses = await this.quizResponseModel.findAll({
+      where: { participantId, quizId },
+    });
+
+    const totalMarks = await this.quizQuestionModel.findAll({
+      where: { quizId },
+    });
+
+    const totalPossibleMarks = totalMarks.reduce(
+      (sum, q) => sum + (q.marks || 1),
+      0,
+    );
+    const earnedMarks = responses.reduce(
+      (sum, r) => sum + (r.marksAwarded || 0),
+      0,
+    );
+    const percentageScore =
+      totalPossibleMarks > 0 ? (earnedMarks / totalPossibleMarks) * 100 : 0;
+
+    const quiz = await this.quizModel.findByPk(quizId);
+    if (!quiz) {
+      throw new NotFoundException('Quiz not found');
+    }
+    const passed = percentageScore >= quiz.passMark;
+
+    participant.status = QuizParticipantStatus.COMPLETED;
+    participant.terminatedByTabSwitch = true;
+    participant.score = earnedMarks;
+    participant.percentageScore = percentageScore;
+    participant.passed = passed;
+
+    await participant.save();
+
+    return { participant, terminated: true };
   }
 
   async getParticipantResults(participantId: string): Promise<{
