@@ -85,7 +85,8 @@ export class QuizQuestion extends Model<QuizQuestion> {
 
   @Column({
     type: DataType.INTEGER,
-    comment: 'Time limit for this specific question in seconds (for Kahoot style)',
+    comment:
+      'Time limit for this specific question in seconds (for Kahoot style)',
   })
   timeLimit: number;
 

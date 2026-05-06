@@ -13,16 +13,24 @@ import { ForgotPasswordDto, ResetPasswordDto } from '../dto/auth.dto';
 import { UserRole } from '../models/user.model';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('super-admin/signup')
   @ApiOperation({ summary: 'Create a super admin account' })
-  @ApiResponse({ status: 201, description: 'The super admin has been successfully created.' })
+  @ApiResponse({
+    status: 201,
+    description: 'The super admin has been successfully created.',
+  })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   async signup(@Body() createUserDto: CreateUserDto) {
     return this.authService.createSuperAdmin(createUserDto);
@@ -30,7 +38,10 @@ export class AuthController {
 
   @Post('signup')
   @ApiOperation({ summary: 'Create a learner account' })
-  @ApiResponse({ status: 201, description: 'The learner has been successfully created.' })
+  @ApiResponse({
+    status: 201,
+    description: 'The learner has been successfully created.',
+  })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   async learnerSignup(@Body() createUserDto: CreateUserDto) {
     return this.authService.signupLearner(createUserDto);
@@ -38,7 +49,10 @@ export class AuthController {
 
   @Post('login')
   @ApiOperation({ summary: 'Login to the application' })
-  @ApiResponse({ status: 200, description: 'Login successful, returns JWT token.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Login successful, returns JWT token.',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
@@ -46,7 +60,10 @@ export class AuthController {
 
   @Post('forgot-password')
   @ApiOperation({ summary: 'Request password reset' })
-  @ApiResponse({ status: 200, description: 'Password reset email sent if user exists.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Password reset email sent if user exists.',
+  })
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     return this.authService.forgotPassword(forgotPasswordDto);
   }

@@ -1,4 +1,12 @@
-import { IsString, IsNotEmpty, IsUUID, IsOptional, IsEnum, IsDateString, IsObject } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsUUID,
+  IsOptional,
+  IsEnum,
+  IsDateString,
+  IsObject,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { LiveSessionStatus } from '../models/live-session.model';
 

@@ -21,7 +21,10 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '../models';
 import { LiveSessionService } from './live-session.service';
-import { CreateLiveSessionDto, UpdateLiveSessionDto } from '../dto/live-session.dto';
+import {
+  CreateLiveSessionDto,
+  UpdateLiveSessionDto,
+} from '../dto/live-session.dto';
 
 @ApiTags('Live Sessions')
 @Controller('live-sessions')
@@ -69,7 +72,12 @@ export class LiveSessionController {
     @Body() dto: UpdateLiveSessionDto,
     @NestRequest() req: AuthenticatedRequest,
   ) {
-    return this.liveSessionService.updateSession(id, dto, req.user.userId, req.user.role);
+    return this.liveSessionService.updateSession(
+      id,
+      dto,
+      req.user.userId,
+      req.user.role,
+    );
   }
 
   @Post('webhook')

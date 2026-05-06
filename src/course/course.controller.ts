@@ -41,7 +41,7 @@ import {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class CourseController {
-  constructor(private readonly courseService: CourseService) { }
+  constructor(private readonly courseService: CourseService) {}
 
   // ═══════════════════════════════════════════════════════════════
   //  COURSE CRUD

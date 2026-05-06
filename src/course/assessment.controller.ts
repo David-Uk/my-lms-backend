@@ -40,7 +40,7 @@ import { QuizSessionStatus } from '../models';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class AssessmentController {
-  constructor(private readonly assessmentService: AssessmentService) { }
+  constructor(private readonly assessmentService: AssessmentService) {}
 
   @Post('content/:contentId')
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TUTOR)

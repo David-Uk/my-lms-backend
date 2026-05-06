@@ -30,4 +30,4 @@ import {
   providers: [AiService, AiProcessor],
   controllers: [AiController],
 })
-export class AiModule { }
+export class AiModule {}

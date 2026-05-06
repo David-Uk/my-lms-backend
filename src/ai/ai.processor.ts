@@ -31,7 +31,10 @@ export interface JobResult {
 @Injectable()
 export class AiProcessor {
   private readonly logger = new Logger(AiProcessor.name);
-  private jobs = new Map<string, { status: string; result?: any; promise?: Promise<any> }>();
+  private jobs = new Map<
+    string,
+    { status: string; result?: any; promise?: Promise<any> }
+  >();
 
   async processJob(jobData: JobData): Promise<string> {
     const jobId = jobData.id;
@@ -45,7 +48,7 @@ export class AiProcessor {
       this.logger.error(`Job ${jobId} failed: ${error.message}`);
       this.jobs.set(jobId, {
         status: 'failed',
-        result: { success: false, error: error.message }
+        result: { success: false, error: error.message },
       });
       return jobId;
     }
@@ -85,7 +88,8 @@ export class AiProcessor {
         throw new Error('Failed to parse JSON from Ollama response');
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`Quiz generation failed: ${errorMessage}`);
     }
   }
@@ -111,7 +115,8 @@ export class AiProcessor {
         throw new Error('Failed to parse JSON from Ollama response');
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`Flashcard generation failed: ${errorMessage}`);
     }
   }

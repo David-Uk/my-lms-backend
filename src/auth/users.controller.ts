@@ -30,7 +30,7 @@ import {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class UsersController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Post()
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
@@ -61,9 +61,7 @@ export class UsersController {
     status: 403,
     description: 'Forbidden. Requires Admin or SuperAdmin role.',
   })
-  async findAll(
-    @NestRequest() req: AuthenticatedRequest,
-  ) {
+  async findAll(@NestRequest() req: AuthenticatedRequest) {
     return this.authService.findAllUsers(req.user.userId, req.user.role);
   }
 

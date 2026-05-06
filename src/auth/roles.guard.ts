@@ -24,7 +24,7 @@ export class RolesGuard implements CanActivate {
     }>();
     const user = request.user;
     const hasRole = user && user.role && requiredRoles.includes(user.role);
-    
+
     if (!hasRole) {
       console.error('[RolesGuard] Access denied:', {
         userRole: user?.role,

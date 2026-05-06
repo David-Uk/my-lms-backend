@@ -54,7 +54,8 @@ export class CodeChallengeSubmission extends Model<CodeChallengeSubmission> {
 
   @Column({
     type: DataType.JSONB,
-    comment: 'Results for each test case: { input, expected, output, error, status }',
+    comment:
+      'Results for each test case: { input, expected, output, error, status }',
   })
   results: any;
 

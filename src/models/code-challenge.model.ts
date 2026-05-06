@@ -55,7 +55,8 @@ export class CodeChallenge extends Model<CodeChallenge> {
   @AllowNull(false)
   @Column({
     type: DataType.JSONB,
-    comment: 'Array of test cases: { input: string, expectedOutput: string, isHidden: boolean }',
+    comment:
+      'Array of test cases: { input: string, expectedOutput: string, isHidden: boolean }',
   })
   testCases: any;
 

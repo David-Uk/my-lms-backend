@@ -35,15 +35,13 @@ export class StatsController {
     private courseTutorModel: typeof CourseTutor,
     @InjectModel(Cohort)
     private cohortModel: typeof Cohort,
-  ) { }
+  ) {}
 
   @Get('dashboard')
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
   @ApiOperation({ summary: 'Get admin dashboard statistics' })
   @ApiResponse({ status: 200, description: 'Dashboard stats retrieved.' })
-  async getDashboardStats(
-    @NestRequest() req: AuthenticatedRequest,
-  ) {
+  async getDashboardStats(@NestRequest() req: AuthenticatedRequest) {
     const where: any = {};
 
     // Filter based on role: Admin sees everything except SuperAdmins
@@ -100,9 +98,10 @@ export class StatsController {
       where: { status: 'completed' },
     });
 
-    const completionRate = totalEnrollments > 0
-      ? Math.round((completedEnrollments / totalEnrollments) * 100)
-      : 0;
+    const completionRate =
+      totalEnrollments > 0
+        ? Math.round((completedEnrollments / totalEnrollments) * 100)
+        : 0;
 
     // Get tutors count
     const totalTutors = await this.userModel.count({
@@ -136,9 +135,7 @@ export class StatsController {
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
   @ApiOperation({ summary: 'Get tutor statistics' })
   @ApiResponse({ status: 200, description: 'Tutor stats retrieved.' })
-  async getTutorStats(
-    @NestRequest() req: AuthenticatedRequest,
-  ) {
+  async getTutorStats(@NestRequest() req: AuthenticatedRequest) {
     const where: any = { role: UserRole.TUTOR };
 
     if (req.user.role === UserRole.ADMIN) {
@@ -167,9 +164,7 @@ export class StatsController {
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TUTOR)
   @ApiOperation({ summary: 'Get learner statistics' })
   @ApiResponse({ status: 200, description: 'Learner stats retrieved.' })
-  async getLearnerStats(
-    @NestRequest() req: AuthenticatedRequest,
-  ) {
+  async getLearnerStats(@NestRequest() req: AuthenticatedRequest) {
     const where: any = { role: UserRole.LEARNER };
 
     if (req.user.role === UserRole.ADMIN) {
@@ -199,9 +194,10 @@ export class StatsController {
       where: { status: 'completed' },
     });
 
-    const completionRate = totalEnrollments > 0
-      ? Math.round((completedEnrollments / totalEnrollments) * 100)
-      : 0;
+    const completionRate =
+      totalEnrollments > 0
+        ? Math.round((completedEnrollments / totalEnrollments) * 100)
+        : 0;
 
     return {
       totalLearners,
@@ -213,7 +209,7 @@ export class StatsController {
 
   @Get('my-students')
   @Roles(UserRole.TUTOR)
-  @ApiOperation({ summary: 'Get tutor\'s assigned students' })
+  @ApiOperation({ summary: "Get tutor's assigned students" })
   @ApiResponse({ status: 200, description: 'Students retrieved.' })
   async getMyStudents(
     @NestRequest() req: Request & { user: { userId: string } },
@@ -233,7 +229,14 @@ export class StatsController {
                   include: [
                     {
                       model: User,
-                      attributes: ['id', 'firstName', 'lastName', 'email', 'status', 'createdAt'],
+                      attributes: [
+                        'id',
+                        'firstName',
+                        'lastName',
+                        'email',
+                        'status',
+                        'createdAt',
+                      ],
                     },
                   ],
                 },
@@ -278,7 +281,10 @@ export class StatsController {
   @Get('learner-dashboard')
   @Roles(UserRole.LEARNER)
   @ApiOperation({ summary: 'Get learner dashboard statistics' })
-  @ApiResponse({ status: 200, description: 'Learner dashboard stats retrieved.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Learner dashboard stats retrieved.',
+  })
   async getLearnerDashboard(
     @NestRequest() req: Request & { user: { userId: string } },
   ) {
@@ -293,7 +299,13 @@ export class StatsController {
           include: [
             {
               model: Course,
-              attributes: ['id', 'title', 'description', 'thumbnail', 'difficultyLevel'],
+              attributes: [
+                'id',
+                'title',
+                'description',
+                'thumbnail',
+                'difficultyLevel',
+              ],
             },
           ],
         },
@@ -301,37 +313,52 @@ export class StatsController {
     });
 
     // Get all course IDs the learner is enrolled in
-    const courseIds = enrollments.map(e => e.cohort?.course?.id).filter(Boolean);
+    const courseIds = enrollments
+      .map((e) => e.cohort?.course?.id)
+      .filter(Boolean);
 
     // Get total active enrollments count
-    const activeEnrollments = enrollments.filter(e => e.status === 'active').length;
-    const completedEnrollments = enrollments.filter(e => e.status === 'completed').length;
+    const activeEnrollments = enrollments.filter(
+      (e) => e.status === 'active',
+    ).length;
+    const completedEnrollments = enrollments.filter(
+      (e) => e.status === 'completed',
+    ).length;
 
     // Get lesson progress for this learner (would need LessonProgress model)
     // For now, calculate based on enrollment status
     const totalEnrollments = enrollments.length;
-    const averageProgress = totalEnrollments > 0
-      ? Math.round((completedEnrollments / totalEnrollments) * 100)
-      : 0;
+    const averageProgress =
+      totalEnrollments > 0
+        ? Math.round((completedEnrollments / totalEnrollments) * 100)
+        : 0;
 
     // Get recent enrollments (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const recentEnrollments = enrollments.filter(
-      e => new Date(e.createdAt) >= thirtyDaysAgo
+      (e) => new Date(e.createdAt) >= thirtyDaysAgo,
     ).length;
 
     // Format enrolled courses with progress info
-    const enrolledCourses = enrollments.map(enrollment => ({
-      id: enrollment.cohort?.course?.id || '',
-      title: enrollment.cohort?.course?.title || 'Unknown Course',
-      description: enrollment.cohort?.course?.description || '',
-      difficultyLevel: enrollment.cohort?.course?.difficultyLevel || 'beginner',
-      progress: enrollment.status === 'completed' ? 100 : enrollment.status === 'active' ? 45 : 10,
-      status: enrollment.status,
-      lastAccessed: enrollment.updatedAt,
-      cohortName: enrollment.cohort?.name || '',
-    })).filter(c => c.id !== '');
+    const enrolledCourses = enrollments
+      .map((enrollment) => ({
+        id: enrollment.cohort?.course?.id || '',
+        title: enrollment.cohort?.course?.title || 'Unknown Course',
+        description: enrollment.cohort?.course?.description || '',
+        difficultyLevel:
+          enrollment.cohort?.course?.difficultyLevel || 'beginner',
+        progress:
+          enrollment.status === 'completed'
+            ? 100
+            : enrollment.status === 'active'
+              ? 45
+              : 10,
+        status: enrollment.status,
+        lastAccessed: enrollment.updatedAt,
+        cohortName: enrollment.cohort?.name || '',
+      }))
+      .filter((c) => c.id !== '');
 
     return {
       stats: {

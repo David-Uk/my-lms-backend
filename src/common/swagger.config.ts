@@ -52,7 +52,10 @@ Authorization: Bearer <token>
     .addTag('Users', 'User CRUD operations')
     .addTag('Courses', 'Course management, tutors, learners, and content')
     .addTag('Assessments', 'Quizzes, code challenges, and group sessions')
-    .addTag('AI', 'AI-powered features: transcription, quiz/flashcard generation')
+    .addTag(
+      'AI',
+      'AI-powered features: transcription, quiz/flashcard generation',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
@@ -73,7 +76,10 @@ Authorization: Bearer <token>
 
   // Write Postman collection v2.1
   const postman = buildPostmanCollection(document);
-  fs.writeFileSync('./postman_collection.json', JSON.stringify(postman, null, 2));
+  fs.writeFileSync(
+    './postman_collection.json',
+    JSON.stringify(postman, null, 2),
+  );
   console.log('✅ Postman collection: ./postman_collection.json');
 }
 
@@ -97,7 +103,9 @@ function buildPostmanCollection(openapi: any): object {
       // Build URL
       const rawSegments = path.replace(/^\//, '').split('/');
       const segments = rawSegments.map((s: string) =>
-        s.startsWith('{') ? { value: `:${s.slice(1, -1)}`, key: s.slice(1, -1) } : s,
+        s.startsWith('{')
+          ? { value: `:${s.slice(1, -1)}`, key: s.slice(1, -1) }
+          : s,
       );
 
       const urlObj: any = {
@@ -107,7 +115,9 @@ function buildPostmanCollection(openapi: any): object {
       };
 
       // Query params
-      const queryParams = (op.parameters ?? []).filter((p: any) => p.in === 'query');
+      const queryParams = (op.parameters ?? []).filter(
+        (p: any) => p.in === 'query',
+      );
       if (queryParams.length) {
         urlObj.query = queryParams.map((p: any) => ({
           key: p.name,
@@ -118,7 +128,9 @@ function buildPostmanCollection(openapi: any): object {
       }
 
       // Path variables
-      const pathParams = (op.parameters ?? []).filter((p: any) => p.in === 'path');
+      const pathParams = (op.parameters ?? []).filter(
+        (p: any) => p.in === 'path',
+      );
       if (pathParams.length) {
         urlObj.variable = pathParams.map((p: any) => ({
           key: p.name,
@@ -136,20 +148,24 @@ function buildPostmanCollection(openapi: any): object {
         if (jsonContent) {
           body = {
             mode: 'raw',
-            raw: JSON.stringify(buildExampleFromSchema(jsonContent.schema, openapi), null, 2),
+            raw: JSON.stringify(
+              buildExampleFromSchema(jsonContent.schema, openapi),
+              null,
+              2,
+            ),
             options: { raw: { language: 'json' } },
           };
         } else if (formContent) {
           body = {
             mode: 'formdata',
-            formdata: Object.entries<any>(formContent.schema?.properties ?? {}).map(
-              ([key, val]: [string, any]) => ({
-                key,
-                value: '',
-                description: val.description ?? '',
-                type: val.format === 'binary' ? 'file' : 'text',
-              }),
-            ),
+            formdata: Object.entries<any>(
+              formContent.schema?.properties ?? {},
+            ).map(([key, val]: [string, any]) => ({
+              key,
+              value: '',
+              description: val.description ?? '',
+              type: val.format === 'binary' ? 'file' : 'text',
+            })),
           };
         }
       }
@@ -171,7 +187,10 @@ function buildPostmanCollection(openapi: any): object {
         op.security?.some((s: any) => s['JWT'] !== undefined) ||
         op.security?.some((s: any) => s['bearer'] !== undefined);
       if (secured) {
-        item.request.auth = { type: 'bearer', bearer: [{ key: 'token', value: '{{token}}', type: 'string' }] };
+        item.request.auth = {
+          type: 'bearer',
+          bearer: [{ key: 'token', value: '{{token}}', type: 'string' }],
+        };
       }
 
       folderMap[tag].push(item);
@@ -185,12 +204,19 @@ function buildPostmanCollection(openapi: any): object {
   return {
     info: {
       name: 'LMS API',
-      description: 'Learning Management System – auto-generated from OpenAPI spec',
-      schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
+      description:
+        'Learning Management System – auto-generated from OpenAPI spec',
+      schema:
+        'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
     },
     variable: [
       { key: 'baseUrl', value: 'http://localhost:3000', type: 'string' },
-      { key: 'token', value: '', type: 'string', description: 'JWT Bearer token from /auth/login' },
+      {
+        key: 'token',
+        value: '',
+        type: 'string',
+        description: 'JWT Bearer token from /auth/login',
+      },
     ],
     item: folders,
   };

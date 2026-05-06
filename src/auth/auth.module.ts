@@ -18,7 +18,9 @@ import { PassportModule } from '@nestjs/passport';
       useFactory: (configService: ConfigService) => {
         const secret = configService.get<string>('JWT_SECRET');
         if (!secret) {
-          console.warn('[AuthModule] JWT_SECRET is not defined in environment! Using fallback.');
+          console.warn(
+            '[AuthModule] JWT_SECRET is not defined in environment! Using fallback.',
+          );
         }
         return {
           secret: secret || 'supersecretkey123',

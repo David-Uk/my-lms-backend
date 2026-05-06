@@ -167,8 +167,7 @@ export class AssessmentService {
     }
 
     const pin =
-      quiz.groupPin ||
-      Math.floor(100000 + Math.random() * 900000).toString();
+      quiz.groupPin || Math.floor(100000 + Math.random() * 900000).toString();
 
     return this.quizSessionModel.create({
       ...dto,
@@ -343,8 +342,7 @@ export class AssessmentService {
           const runner = new Function(wrappedCode);
           output = runner();
         } else {
-          output =
-            'Execution requires specialized sandbox for this language.';
+          output = 'Execution requires specialized sandbox for this language.';
         }
 
         const passed = String(output) === String(testCase.expectedOutput);

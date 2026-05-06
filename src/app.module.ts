@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import * as path from 'path';
 import { AuthModule } from './auth/auth.module';
 import { CourseModule } from './course/course.module';
 import { AiModule } from './ai/ai.module';
@@ -36,6 +37,8 @@ import {
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      // Resolve .env relative to this file so it works regardless of CWD
+      envFilePath: path.resolve(__dirname, '../../.env'),
     }),
     AuthModule,
     CourseModule,

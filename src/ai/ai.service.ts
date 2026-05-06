@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/sequelize';
-import ollama from 'ollama';
 import { Flashcards } from './ai.processor';
 import {
   User,
@@ -30,13 +29,6 @@ export interface Quiz {
   }[];
 }
 
-// export interface Flashcards {
-//   flashcards: {
-//     front: string;
-//     back: string;
-//   }[];
-// }
-
 export interface OllamaResponse {
   response: string;
 }
@@ -45,9 +37,10 @@ export type { Flashcards };
 
 @Injectable()
 export class AiService {
-  private isProduction: boolean;
-  private ollamaHost: string;
-  private ollamaModel: string;
+  private readonly logger = new Logger(AiService.name);
+  private readonly ollamaBaseUrl: string;
+  private readonly ollamaModel: string;
+  private readonly ollamaApiKey: string | undefined;
 
   constructor(
     private configService: ConfigService,
@@ -62,96 +55,145 @@ export class AiService {
     @InjectModel(Course)
     private courseModel: typeof Course,
   ) {
-    this.isProduction =
-      this.configService.get<string>('NODE_ENV') === 'production';
+    this.ollamaBaseUrl = (
+      this.configService.get<string>('OLLAMA_BASE_URL') ||
+      'http://localhost:11434'
+    ).replace(/\/$/, ''); // strip trailing slash
+    this.ollamaModel =
+      this.configService.get<string>('OLLAMA_MODEL') || 'llama3.2';
+    this.ollamaApiKey = this.configService.get<string>('OLLAMA_API_KEY');
 
-    if (this.isProduction) {
-      // Production: Use Ollama Cloud
-      this.ollamaHost =
-        this.configService.get<string>('OLLAMA_CLOUD_HOST') ||
-        'https://api.olama.ai';
-      this.ollamaModel =
-        this.configService.get<string>('OLLAMA_CLOUD_MODEL') || 'llama3.2';
-    } else {
-      // Development: Use local Ollama
-      this.ollamaHost =
-        this.configService.get<string>('OLLAMA_LOCAL_HOST') ||
-        'http://localhost:11434';
-      this.ollamaModel =
-        this.configService.get<string>('OLLAMA_LOCAL_MODEL') || 'llama3.2';
+    this.logger.log(`AI service ready`);
+    this.logger.log(`  OLLAMA_BASE_URL : ${this.ollamaBaseUrl}`);
+    this.logger.log(`  OLLAMA_MODEL    : ${this.ollamaModel}`);
+    this.logger.log(`  OLLAMA_API_KEY  : ${this.ollamaApiKey ? `${this.ollamaApiKey.substring(0, 8)}…` : 'NOT SET'}`);
+
+    if (!this.ollamaApiKey) {
+      this.logger.warn('OLLAMA_API_KEY is not set — requests to Ollama Cloud will be rejected (401)');
     }
+  }
+
+  private async generateText(
+    prompt: string,
+    options?: { temperature?: number; maxTokens?: number },
+  ): Promise<string> {
+    const url = `${this.ollamaBaseUrl}/api/generate`;
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    if (this.ollamaApiKey) {
+      headers['Authorization'] = `Bearer ${this.ollamaApiKey}`;
+    }
+
+    const body = {
+      model: this.ollamaModel,
+      prompt,
+      stream: false,
+      options: {
+        temperature: options?.temperature ?? 0.7,
+        num_predict: options?.maxTokens ?? 1024,
+      },
+    };
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 120_000);
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Ollama error (${response.status}): ${errorText}`);
+      }
+
+      const data = (await response.json()) as OllamaResponse;
+      return data.response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      const err = error instanceof Error ? error : new Error('Unknown error');
+      if (err.name === 'AbortError') {
+        throw new Error('Ollama request timed out after 2 minutes');
+      }
+      if (
+        err.message.includes('ECONNREFUSED') ||
+        err.message.includes('fetch failed')
+      ) {
+        throw new Error(
+          `Cannot connect to Ollama at ${this.ollamaBaseUrl}. ` +
+          `then run: ollama pull ${this.ollamaModel}`,
+        );
+      }
+      throw new Error(`Ollama call failed: ${err.message}`);
+    }
+  }
+
+  private extractJson(text: string): string {
+    // Strip markdown code fences if present
+    const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (fenced) return fenced[1].trim();
+    // Fall back to first {...} block
+    const bare = text.match(/\{[\s\S]*\}/);
+    if (bare) return bare[0];
+    throw new Error('No JSON found in AI response');
   }
 
   transcribeAudio(_file: MulterFile): Promise<never> {
     return Promise.reject(
       new Error(
-        'Audio transcription is not supported with Ollama. Consider using a separate service for audio processing.',
+        'Audio transcription is not supported. Use a dedicated transcription service.',
       ),
     );
   }
 
   async generateQuiz(topic: string): Promise<Quiz> {
+    const prompt = `Generate a quiz on the topic: "${topic}".
+Return exactly 5 multiple-choice questions, each with 4 options and one correct answer.
+Respond with valid JSON only — no markdown, no explanation.
+Use this exact structure:
+{
+  "questions": [
+    {
+      "question": "...",
+      "options": ["option A", "option B", "option C", "option D"],
+      "correctAnswer": "option A"
+    }
+  ]
+}`;
+
     try {
-      const prompt = `Generate a quiz on the topic: ${topic}. Provide 5 multiple-choice questions with 4 options each, and indicate the correct answer. Format as JSON with structure: { questions: [{ question: string, options: [string], correctAnswer: string }] }`;
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const response = (await ollama.generate({
-        model: this.ollamaModel,
-        prompt: prompt,
-        options: {
-          temperature: 0.7,
-          num_predict: 1000,
-        },
-      })) as OllamaResponse;
-
-      const content = response.response;
-
-      // FIX 3: Destructure the match result so TypeScript knows jsonStr is a
-      // string (not string | undefined) inside the truthy branch.
-      const match = content.match(/\{[\s\S]*\}/);
-      if (match) {
-        const [jsonStr] = match;
-        return JSON.parse(jsonStr) as Quiz;
-      } else {
-        throw new Error('Failed to parse JSON from Ollama response');
-      }
+      const content = await this.generateText(prompt, { maxTokens: 1024 });
+      return JSON.parse(this.extractJson(content)) as Quiz;
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      throw new Error(`Quiz generation failed: ${errorMessage}`);
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Quiz generation failed: ${msg}`);
     }
   }
 
   async generateFlashcards(topic: string): Promise<Flashcards> {
+    const prompt = `Generate 10 flashcards on the topic: "${topic}".
+Respond with valid JSON only — no markdown, no explanation.
+Use this exact structure:
+{
+  "flashcards": [
+    { "front": "Question or term", "back": "Answer or definition" }
+  ]
+}`;
+
     try {
-      const prompt = `Generate 10 flashcards on the topic: ${topic}. Each flashcard should have a front (question) and back (answer). Format as JSON with structure: { flashcards: [{ front: string, back: string }] }`;
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const response = (await ollama.generate({
-        // FIX 2: Was hardcoded to 'llama3.2', now correctly uses this.ollamaModel
-        // so production and development configs are both respected.
-        model: this.ollamaModel,
-        prompt: prompt,
-        options: {
-          temperature: 0.7,
-          num_predict: 1000,
-        },
-      })) as OllamaResponse;
-
-      const content = response.response;
-
-      // FIX 3: Same destructuring fix as generateQuiz above.
-      const match = content.match(/\{[\s\S]*\}/);
-      if (match) {
-        const [jsonStr] = match;
-        return JSON.parse(jsonStr) as Flashcards;
-      } else {
-        throw new Error('Failed to parse JSON from Ollama response');
-      }
+      const content = await this.generateText(prompt, { maxTokens: 1024 });
+      return JSON.parse(this.extractJson(content)) as Flashcards;
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      throw new Error(`Flashcard generation failed: ${errorMessage}`);
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Flashcard generation failed: ${msg}`);
     }
   }
 
@@ -162,55 +204,40 @@ export class AiService {
     rawData: Record<string, unknown>;
   }> {
     try {
-      // Gather student performance data
       const totalStudents = await this.userModel.count({
         where: { role: UserRole.LEARNER },
       });
-
       const activeEnrollments = await this.enrollmentModel.count({
         where: { status: EnrollmentStatus.ACTIVE },
       });
-
       const completedEnrollments = await this.enrollmentModel.count({
         where: { status: EnrollmentStatus.COMPLETED },
       });
-
       const totalCourses = await this.courseModel.count();
-
-      // Calculate completion rate
       const totalEnrollments = await this.enrollmentModel.count();
       const completionRate =
         totalEnrollments > 0
           ? (completedEnrollments / totalEnrollments) * 100
           : 0;
-
-      // Get lesson progress stats
       const totalLessonsCompleted = await this.lessonProgressModel.count({
         where: { isCompleted: true },
       });
-
       const totalLessonProgressEntries = await this.lessonProgressModel.count();
       const lessonCompletionRate =
         totalLessonProgressEntries > 0
           ? (totalLessonsCompleted / totalLessonProgressEntries) * 100
           : 0;
-
-      // Get quiz performance stats
       const quizAnswers = await this.quizAnswerModel.findAll();
       const totalQuizAttempts = quizAnswers.length;
       const correctAnswers = quizAnswers.filter((a) => a.isCorrect).length;
-      const quizAccuracyRate = totalQuizAttempts > 0
-        ? (correctAnswers / totalQuizAttempts) * 100
-        : 0;
-
-      // Get average quiz response time
+      const quizAccuracyRate =
+        totalQuizAttempts > 0 ? (correctAnswers / totalQuizAttempts) * 100 : 0;
       const avgResponseTimeMs =
         totalQuizAttempts > 0
           ? quizAnswers.reduce((sum, a) => sum + (a.responseTimeMs || 0), 0) /
           totalQuizAttempts
           : 0;
 
-      // Compile raw data
       const rawData = {
         totalStudents,
         activeEnrollments,
@@ -225,10 +252,10 @@ export class AiService {
           Math.round((avgResponseTimeMs / 1000) * 100) / 100,
       };
 
-      // Prepare prompt for AI analysis
-      const analysisPrompt = `Analyze the following student performance data from a Learning Management System and provide insights and recommendations:
+      const prompt = `Analyze this LMS performance data and return insights.
+Respond with valid JSON only — no markdown, no explanation.
 
-PERFORMANCE DATA:
+DATA:
 - Total Students: ${totalStudents}
 - Active Enrollments: ${activeEnrollments}
 - Completed Enrollments: ${completedEnrollments}
@@ -236,54 +263,26 @@ PERFORMANCE DATA:
 - Lesson Completion Rate: ${lessonCompletionRate.toFixed(2)}%
 - Total Quiz Attempts: ${totalQuizAttempts}
 - Quiz Accuracy Rate: ${quizAccuracyRate.toFixed(2)}%
-- Average Quiz Response Time: ${(avgResponseTimeMs / 1000).toFixed(2)} seconds
+- Avg Quiz Response Time: ${(avgResponseTimeMs / 1000).toFixed(2)}s
 
-Please provide a structured analysis with:
-1. A brief summary (2-3 sentences) of overall performance
-2. 3-5 key insights about student engagement and performance patterns
-3. 3-5 actionable recommendations for improving student outcomes
-
-Format your response as JSON with this exact structure:
+Use this exact structure:
 {
-  "summary": "Brief summary text",
+  "summary": "2-3 sentence overview",
   "insights": ["insight 1", "insight 2", "insight 3"],
   "recommendations": ["recommendation 1", "recommendation 2", "recommendation 3"]
 }`;
 
-      // Call Ollama for analysis
-      const response = (await ollama.generate({
-        model: this.ollamaModel,
-        prompt: analysisPrompt,
-        options: {
-          temperature: 0.7,
-          num_predict: 2000,
-        },
-      })) as OllamaResponse;
-
-      const content = response.response;
-
-      // Extract JSON from response
-      const match = content.match(/\{[\s\S]*\}/);
-      if (!match) {
-        throw new Error('Failed to parse AI analysis response');
-      }
-      const [jsonStr] = match;
-      const analysis = JSON.parse(jsonStr) as {
+      const content = await this.generateText(prompt, { maxTokens: 1024 });
+      const analysis = JSON.parse(this.extractJson(content)) as {
         summary: string;
         insights: string[];
         recommendations: string[];
       };
 
-      return {
-        summary: analysis.summary,
-        insights: analysis.insights,
-        recommendations: analysis.recommendations,
-        rawData,
-      };
+      return { ...analysis, rawData };
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      throw new Error(`Student performance analysis failed: ${errorMessage}`);
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Student performance analysis failed: ${msg}`);
     }
   }
 }

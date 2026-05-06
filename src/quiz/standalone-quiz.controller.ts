@@ -34,7 +34,7 @@ import {
 @ApiTags('Standalone Quizzes')
 @Controller('quizzes')
 export class StandaloneQuizController {
-  constructor(private readonly standaloneQuizService: StandaloneQuizService) { }
+  constructor(private readonly standaloneQuizService: StandaloneQuizService) {}
 
   @Post('standalone')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -92,10 +92,7 @@ export class StandaloneQuizController {
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TUTOR)
   @ApiOperation({ summary: 'Copy a question from another quiz' })
   @ApiParam({ name: 'id', description: 'Target Quiz ID' })
-  async copyQuestion(
-    @Param('id') id: string,
-    @Body() dto: CopyQuestionDto,
-  ) {
+  async copyQuestion(@Param('id') id: string, @Body() dto: CopyQuestionDto) {
     return this.standaloneQuizService.addQuestionFromAnotherQuiz(id, dto);
   }
 
@@ -155,7 +152,11 @@ export class StandaloneQuizController {
     @Param('token') token: string,
     @Headers('x-device-fingerprint') deviceFingerprint?: string,
   ) {
-    return this.standaloneQuizService.getQuizForTaking(quizId, token, deviceFingerprint);
+    return this.standaloneQuizService.getQuizForTaking(
+      quizId,
+      token,
+      deviceFingerprint,
+    );
   }
 
   @Post('take/:quizId/:participantId/answer')

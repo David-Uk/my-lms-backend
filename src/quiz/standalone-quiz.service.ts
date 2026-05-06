@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import {
@@ -34,7 +38,7 @@ export class StandaloneQuizService {
     private quizAccessTokenModel: typeof QuizAccessToken,
     @InjectModel(QuizResponse)
     private quizResponseModel: typeof QuizResponse,
-  ) { }
+  ) {}
 
   async createStandaloneQuiz(dto: CreateStandaloneQuizDto): Promise<Quiz> {
     return this.quizModel.create({
@@ -113,7 +117,9 @@ export class StandaloneQuizService {
     return { tokens, participantEmails };
   }
 
-  async startQuiz(dto: StartQuizDto & { deviceFingerprint?: string; deviceInfo?: string }): Promise<{ quiz: Quiz; participant: QuizParticipant }> {
+  async startQuiz(
+    dto: StartQuizDto & { deviceFingerprint?: string; deviceInfo?: string },
+  ): Promise<{ quiz: Quiz; participant: QuizParticipant }> {
     const tokenRecord = await this.quizAccessTokenModel.findOne({
       where: {
         quizId: dto.quizId,
@@ -156,14 +162,20 @@ export class StandaloneQuizService {
     if (participant.status === QuizParticipantStatus.STARTED) {
       if (dto.deviceFingerprint && participant.deviceFingerprint) {
         if (participant.deviceFingerprint !== dto.deviceFingerprint) {
-          throw new BadRequestException('You already have an active session on another device. Please use the same device to complete the quiz.');
+          throw new BadRequestException(
+            'You already have an active session on another device. Please use the same device to complete the quiz.',
+          );
         }
       } else if (participant.deviceInfo && dto.deviceInfo) {
         if (participant.deviceInfo !== dto.deviceInfo) {
-          throw new BadRequestException('You already have an active session on another device. Please use the same device to complete the quiz.');
+          throw new BadRequestException(
+            'You already have an active session on another device. Please use the same device to complete the quiz.',
+          );
         }
       } else {
-        throw new BadRequestException('You already have an active session. Please continue from your previous session.');
+        throw new BadRequestException(
+          'You already have an active session. Please continue from your previous session.',
+        );
       }
       return { quiz, participant };
     }
@@ -243,7 +255,9 @@ export class StandaloneQuizService {
     if (participant.status === QuizParticipantStatus.STARTED) {
       if (deviceFingerprint && participant.deviceFingerprint) {
         if (participant.deviceFingerprint !== deviceFingerprint) {
-          throw new BadRequestException('You already have an active session on another device');
+          throw new BadRequestException(
+            'You already have an active session on another device',
+          );
         }
       }
     }
@@ -280,7 +294,8 @@ export class StandaloneQuizService {
       throw new NotFoundException('Question not found');
     }
 
-    const isCorrect = JSON.stringify(question.correctAnswer) === JSON.stringify(dto.answer);
+    const isCorrect =
+      JSON.stringify(question.correctAnswer) === JSON.stringify(dto.answer);
 
     const response = await this.quizResponseModel.create({
       quizId,
@@ -294,7 +309,10 @@ export class StandaloneQuizService {
     return response;
   }
 
-  async completeQuiz(participantId: string, quizId: string): Promise<QuizParticipant> {
+  async completeQuiz(
+    participantId: string,
+    quizId: string,
+  ): Promise<QuizParticipant> {
     const participant = await this.quizParticipantModel.findByPk(participantId);
 
     if (!participant || participant.quizId !== quizId) {
@@ -309,9 +327,16 @@ export class StandaloneQuizService {
       where: { quizId },
     });
 
-    const totalPossibleMarks = totalMarks.reduce((sum, q) => sum + (q.marks || 1), 0);
-    const earnedMarks = responses.reduce((sum, r) => sum + (r.marksAwarded || 0), 0);
-    const percentageScore = totalPossibleMarks > 0 ? (earnedMarks / totalPossibleMarks) * 100 : 0;
+    const totalPossibleMarks = totalMarks.reduce(
+      (sum, q) => sum + (q.marks || 1),
+      0,
+    );
+    const earnedMarks = responses.reduce(
+      (sum, r) => sum + (r.marksAwarded || 0),
+      0,
+    );
+    const percentageScore =
+      totalPossibleMarks > 0 ? (earnedMarks / totalPossibleMarks) * 100 : 0;
 
     const quiz = await this.quizModel.findByPk(quizId);
     if (!quiz) {

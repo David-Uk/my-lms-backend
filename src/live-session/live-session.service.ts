@@ -6,8 +6,20 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { ConfigService } from '@nestjs/config';
-import { LiveSession, LiveSessionStatus, User, Course, Cohort, Enrollment, CourseTutor, UserRole } from '../models';
-import { CreateLiveSessionDto, UpdateLiveSessionDto } from '../dto/live-session.dto';
+import {
+  LiveSession,
+  LiveSessionStatus,
+  User,
+  Course,
+  Cohort,
+  Enrollment,
+  CourseTutor,
+  UserRole,
+} from '../models';
+import {
+  CreateLiveSessionDto,
+  UpdateLiveSessionDto,
+} from '../dto/live-session.dto';
 import * as jwt from 'jsonwebtoken';
 import axios from 'axios';
 
@@ -30,11 +42,17 @@ export class LiveSessionService {
     private courseTutorModel: typeof CourseTutor,
     private configService: ConfigService,
   ) {
-    this.VIDEOSDK_API_KEY = this.configService.get<string>('VIDEOSDK_API_KEY') || 'placeholder_key';
-    this.VIDEOSDK_SECRET_KEY = this.configService.get<string>('VIDEOSDK_SECRET_KEY') || 'placeholder_secret';
+    this.VIDEOSDK_API_KEY =
+      this.configService.get<string>('VIDEOSDK_API_KEY') || 'placeholder_key';
+    this.VIDEOSDK_SECRET_KEY =
+      this.configService.get<string>('VIDEOSDK_SECRET_KEY') ||
+      'placeholder_secret';
   }
 
-  async createSession(dto: CreateLiveSessionDto, tutorId: string): Promise<LiveSession> {
+  async createSession(
+    dto: CreateLiveSessionDto,
+    tutorId: string,
+  ): Promise<LiveSession> {
     // Verify course exists
     const course = await this.courseModel.findByPk(dto.courseId);
     if (!course) throw new NotFoundException('Course not found');
@@ -53,7 +71,10 @@ export class LiveSessionService {
       );
       meetingId = response.data.roomId;
     } catch (error) {
-      console.error('Error creating VideoSDK room:', error.response?.data || error.message);
+      console.error(
+        'Error creating VideoSDK room:',
+        error.response?.data || error.message,
+      );
       throw new BadRequestException('Failed to create streaming room');
     }
 
@@ -85,7 +106,8 @@ export class LiveSessionService {
         const isAssigned = await this.courseTutorModel.findOne({
           where: { tutorId: userId, courseId: session.courseId },
         });
-        if (!isAssigned) throw new ForbiddenException('You are not assigned to this course');
+        if (!isAssigned)
+          throw new ForbiddenException('You are not assigned to this course');
       }
     }
 
@@ -105,12 +127,21 @@ export class LiveSessionService {
     });
   }
 
-  async updateSession(id: string, dto: UpdateLiveSessionDto, userId: string, role: UserRole) {
+  async updateSession(
+    id: string,
+    dto: UpdateLiveSessionDto,
+    userId: string,
+    role: UserRole,
+  ) {
     const session = await this.liveSessionModel.findByPk(id);
     if (!session) throw new NotFoundException('Session not found');
 
     // Only tutor or admin can update
-    if (role !== UserRole.ADMIN && role !== UserRole.SUPERADMIN && session.tutorId !== userId) {
+    if (
+      role !== UserRole.ADMIN &&
+      role !== UserRole.SUPERADMIN &&
+      session.tutorId !== userId
+    ) {
       throw new ForbiddenException('Access denied');
     }
 
@@ -143,13 +174,18 @@ export class LiveSessionService {
     const { type, data } = payload;
 
     if (type === 'recording.stopped') {
-        const sessionId = data.roomId; // You'll need to map roomId to your session
-        const recordingUrl = data.recordingUrl;
-        
-        const session = await this.liveSessionModel.findOne({ where: { meetingId: sessionId } });
-        if (session) {
-            await session.update({ recordingUrl, status: LiveSessionStatus.COMPLETED });
-        }
+      const sessionId = data.roomId; // You'll need to map roomId to your session
+      const recordingUrl = data.recordingUrl;
+
+      const session = await this.liveSessionModel.findOne({
+        where: { meetingId: sessionId },
+      });
+      if (session) {
+        await session.update({
+          recordingUrl,
+          status: LiveSessionStatus.COMPLETED,
+        });
+      }
     }
   }
 }

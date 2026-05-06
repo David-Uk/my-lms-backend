@@ -197,7 +197,10 @@ export class SubmitCodeChallengeDto {
 }
 
 export class CreateStandaloneQuizDto {
-  @ApiProperty({ example: 'JavaScript Fundamentals', description: 'Quiz title' })
+  @ApiProperty({
+    example: 'JavaScript Fundamentals',
+    description: 'Quiz title',
+  })
   @IsNotEmpty()
   @IsString()
   title: string;
@@ -227,7 +230,10 @@ export class InviteParticipantDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ example: 'john@example.com', description: 'Participant email' })
+  @ApiProperty({
+    example: 'john@example.com',
+    description: 'Participant email',
+  })
   @IsNotEmpty()
   @IsEmail()
   email: string;
@@ -247,11 +253,17 @@ export class InviteParticipantsBulkDto {
 }
 
 export class StartQuizDto {
-  @ApiProperty({ example: 'uuid-of-quiz', description: 'Quiz ID from email link' })
+  @ApiProperty({
+    example: 'uuid-of-quiz',
+    description: 'Quiz ID from email link',
+  })
   @IsUUID()
   quizId: string;
 
-  @ApiProperty({ example: 'uuid-of-token', description: 'Access token from email' })
+  @ApiProperty({
+    example: 'uuid-of-token',
+    description: 'Access token from email',
+  })
   @IsUUID()
   token: string;
 

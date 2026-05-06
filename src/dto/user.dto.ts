@@ -44,7 +44,10 @@ export class CreateUserDto {
   @IsOptional()
   role?: UserRole;
 
-  @ApiPropertyOptional({ enum: UserStatus, description: 'The status of the user' })
+  @ApiPropertyOptional({
+    enum: UserStatus,
+    description: 'The status of the user',
+  })
   @IsEnum(UserStatus)
   @IsOptional()
   status?: UserStatus;
@@ -67,12 +70,18 @@ export class CreateUserDto {
 }
 
 export class UpdateUserDto {
-  @ApiPropertyOptional({ example: 'John', description: 'The first name of the user' })
+  @ApiPropertyOptional({
+    example: 'John',
+    description: 'The first name of the user',
+  })
   @IsString()
   @IsOptional()
   firstName?: string;
 
-  @ApiPropertyOptional({ example: 'Doe', description: 'The last name of the user' })
+  @ApiPropertyOptional({
+    example: 'Doe',
+    description: 'The last name of the user',
+  })
   @IsString()
   @IsOptional()
   lastName?: string;
@@ -100,7 +109,10 @@ export class UpdateUserDto {
   @IsOptional()
   role?: UserRole;
 
-  @ApiPropertyOptional({ enum: UserStatus, description: 'The status of the user' })
+  @ApiPropertyOptional({
+    enum: UserStatus,
+    description: 'The status of the user',
+  })
   @IsEnum(UserStatus)
   @IsOptional()
   status?: UserStatus;

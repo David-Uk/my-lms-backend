@@ -23,7 +23,7 @@ export class AuthService {
     @InjectModel(User)
     private userModel: typeof User,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   async createSuperAdmin(
     createUserDto: CreateUserDto,
@@ -55,10 +55,13 @@ export class AuthService {
     }
 
     // Bypass TS property shadowing by getting the database value directly
-    const storedPassword = user.getDataValue('password') || user.get('password');
+    const storedPassword =
+      user.getDataValue('password') || user.get('password');
 
     if (!loginDto.password || !storedPassword) {
-      throw new UnauthorizedException(`Password missing. Client password sent: ${!!loginDto.password}. DB password exists: ${!!storedPassword}`);
+      throw new UnauthorizedException(
+        `Password missing. Client password sent: ${!!loginDto.password}. DB password exists: ${!!storedPassword}`,
+      );
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -74,16 +77,18 @@ export class AuthService {
     }
 
     // Debug: Log user role before token generation
-    console.log('[AuthService.login] User found:', { 
-      id: user.get('id'), 
-      email: user.get('email'), 
-      role: user.get('role') 
+    console.log('[AuthService.login] User found:', {
+      id: user.get('id'),
+      email: user.get('email'),
+      role: user.get('role'),
     });
 
     const token = this.generateToken(user);
 
     // Debug: Log token payload
-    const tokenPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+    const tokenPayload = JSON.parse(
+      Buffer.from(token.split('.')[1], 'base64').toString(),
+    );
     console.log('[AuthService.login] Token payload:', tokenPayload);
 
     const userJson = JSON.parse(JSON.stringify(user));
@@ -91,7 +96,7 @@ export class AuthService {
 
     return {
       user: userJson as User,
-      token
+      token,
     };
   }
 
@@ -352,9 +357,9 @@ export class AuthService {
   }
 
   private generateToken(user: User): string {
-    const payload = { 
-      userId: user.get('id'), 
-      email: user.get('email'), 
+    const payload = {
+      userId: user.get('id'),
+      email: user.get('email'),
       role: user.get('role'),
       firstName: user.get('firstName'),
       lastName: user.get('lastName'),

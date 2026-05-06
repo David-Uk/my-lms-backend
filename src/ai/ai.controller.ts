@@ -27,7 +27,7 @@ import type { MulterFile } from './ai.service';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class AiController {
-  constructor(private readonly aiService: AiService) { }
+  constructor(private readonly aiService: AiService) {}
 
   @Post('transcribe')
   @Roles(UserRole.LEARNER, UserRole.TUTOR, UserRole.ADMIN, UserRole.SUPERADMIN)
